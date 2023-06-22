@@ -7,6 +7,7 @@ namespace TimeTick
     public class TimeTickManager
     {
         private List<TimeTickController> _timeTickControllers;
+        public List<TimeTickController> TimeTickControllers => _timeTickControllers;
 
         public TimeTickManager()
         {
