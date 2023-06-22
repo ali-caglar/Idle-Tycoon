@@ -10,7 +10,6 @@ namespace TimeTick
 
         public TimeTickManager()
         {
-            TimeTickController temp = new TimeTickController(TimeTickIdentifier.Second1, 0, 1);
             _timeTickControllers = new List<TimeTickController>
             {
                 new(TimeTickIdentifier.Second1, 0, 1),
