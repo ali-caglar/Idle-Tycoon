@@ -11,6 +11,8 @@ namespace TimeTick
         private float _tickDuration;
         public TimeTickIdentifier TimeIdentifier { get; }
 
+        public float TickTimer => _tickTimer;
+        public float TickDuration => _tickDuration;
         public float GetProgress => _tickTimer / _tickDuration;
 
         public TimeTickController(TimeTickIdentifier timeIdentifier, float startTime, float totalTime)
