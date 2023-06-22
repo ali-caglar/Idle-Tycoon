@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Enums;
+using UnityEngine;
 
 namespace TimeTick
 {
@@ -23,8 +24,21 @@ namespace TimeTick
 
         public void AddNewTickController(TimeTickController timeTickController)
         {
+            if (timeTickController.TimeIdentifier != TimeTickIdentifier.Custom)
+            {
+                Debug.LogWarning("Other identifiers than 'custom' are already added.");
+                return;
+            }
+
             _timeTickControllers ??= new List<TimeTickController>();
-            _timeTickControllers.Add(timeTickController);
+            if (!_timeTickControllers.Contains(timeTickController))
+            {
+                _timeTickControllers.Add(timeTickController);
+            }
+            else
+            {
+                Debug.LogWarning("Tried to add that is already existed in the list.");
+            }
         }
 
         public void RemoveTickController(TimeTickController timeTickController)
