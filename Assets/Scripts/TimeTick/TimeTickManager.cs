@@ -44,7 +44,20 @@ namespace TimeTick
         public void RemoveTickController(TimeTickController timeTickController)
         {
             if (_timeTickControllers == null || _timeTickControllers.Count == 0) return;
-            _timeTickControllers.Remove(timeTickController);
+            if (timeTickController.TimeIdentifier != TimeTickIdentifier.Custom)
+            {
+                Debug.LogWarning("You shouldn't remove the default tick controllers.");
+                return;
+            }
+
+            if (_timeTickControllers.Contains(timeTickController))
+            {
+                _timeTickControllers.Remove(timeTickController);
+            }
+            else
+            {
+                Debug.LogWarning("Tried to removed that is not existed in the list.");
+            }
         }
 
         public void UpdateTimers(float timeToIncrease)
