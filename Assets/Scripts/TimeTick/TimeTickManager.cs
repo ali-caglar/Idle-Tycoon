@@ -56,7 +56,7 @@ namespace TimeTick
             }
             else
             {
-                Debug.LogWarning("Tried to removed that is not existed in the list.");
+                Debug.LogWarning("Tried to remove which is not existed in the list.");
             }
         }
 
