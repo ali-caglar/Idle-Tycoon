@@ -4,7 +4,7 @@ using Enums;
 using NUnit.Framework;
 using TimeTick;
 
-namespace Tests
+namespace Tests.TimeTickTests
 {
     public class test_time_tick_manager
     {
