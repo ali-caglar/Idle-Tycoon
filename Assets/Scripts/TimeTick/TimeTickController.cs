@@ -13,7 +13,7 @@ namespace TimeTick
 
         public float GetProgress => TickTimer / TickDuration;
 
-        public TimeTickController(TimeTickIdentifier timeIdentifier, float startTime, float totalTime)
+        public TimeTickController(float startTime, float totalTime, TimeTickIdentifier timeIdentifier = TimeTickIdentifier.Custom)
         {
             if (totalTime <= 0)
             {

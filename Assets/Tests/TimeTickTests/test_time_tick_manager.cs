@@ -44,7 +44,7 @@ namespace Tests
         {
             var manager = new TimeTickManager();
 
-            TimeTickController newController = new TimeTickController(TimeTickIdentifier.Custom, 0, 3);
+            TimeTickController newController = new TimeTickController(0, 3, TimeTickIdentifier.Custom);
             manager.AddNewTickController(newController);
 
             Assert.Contains(newController, manager.TimeTickControllers,
@@ -56,7 +56,7 @@ namespace Tests
         {
             var manager = new TimeTickManager();
 
-            TimeTickController newController = new TimeTickController(TimeTickIdentifier.Custom, 0, 3);
+            TimeTickController newController = new TimeTickController(0, 3, TimeTickIdentifier.Custom);
             manager.AddNewTickController(newController);
             manager.RemoveTickController(newController);
 
@@ -73,7 +73,7 @@ namespace Tests
             {
                 if (identifier == TimeTickIdentifier.Custom) continue;
 
-                TimeTickController newController = new TimeTickController(identifier, 0, 3);
+                TimeTickController newController = new TimeTickController(0, 3, identifier);
                 manager.AddNewTickController(newController);
 
                 int identifierCountInList = manager.TimeTickControllers.Count(x => x.TimeIdentifier == identifier);
@@ -102,7 +102,7 @@ namespace Tests
         {
             var manager = new TimeTickManager();
 
-            TimeTickController newController = new TimeTickController(TimeTickIdentifier.Custom, 0, 3);
+            TimeTickController newController = new TimeTickController(0, 3, TimeTickIdentifier.Custom);
             manager.AddNewTickController(newController);
             manager.AddNewTickController(newController);
             manager.AddNewTickController(newController);
