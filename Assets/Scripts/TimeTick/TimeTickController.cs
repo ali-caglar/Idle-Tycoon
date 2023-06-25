@@ -7,13 +7,11 @@ namespace TimeTick
     {
         public event Action OnTimeTick;
 
-        private float _tickTimer;
-        private float _tickDuration;
+        public float TickTimer { get; private set; }
+        public float TickDuration { get; private set; }
         public TimeTickIdentifier TimeIdentifier { get; }
 
-        public float TickTimer => _tickTimer;
-        public float TickDuration => _tickDuration;
-        public float GetProgress => _tickTimer / _tickDuration;
+        public float GetProgress => TickTimer / TickDuration;
 
         public TimeTickController(TimeTickIdentifier timeIdentifier, float startTime, float totalTime)
         {
@@ -21,28 +19,28 @@ namespace TimeTick
             {
                 throw new Exception("Tick Duration can't be less than or equal to 0");
             }
-        
-            _tickTimer = startTime;
-            _tickDuration = totalTime;
+
+            TickTimer = startTime;
+            TickDuration = totalTime;
             TimeIdentifier = timeIdentifier;
         }
 
         public void UpdateTimer(float timeToIncrease)
         {
-            _tickTimer += timeToIncrease;
-            if (_tickTimer >= _tickDuration)
+            TickTimer += timeToIncrease;
+            if (TickTimer >= TickDuration)
             {
-                _tickTimer -= _tickDuration;
+                TickTimer -= TickDuration;
                 InvokeTimeTick();
             }
         }
 
         public void UpdateTickDuration(float newTickDuration)
         {
-            _tickDuration = newTickDuration;
-            if (_tickTimer >= _tickDuration)
+            TickDuration = newTickDuration;
+            if (TickTimer >= TickDuration)
             {
-                _tickTimer = 0;
+                TickTimer = 0;
                 InvokeTimeTick();
             }
         }
