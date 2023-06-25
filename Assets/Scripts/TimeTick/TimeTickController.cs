@@ -28,7 +28,7 @@ namespace TimeTick
         public void UpdateTimer(float timeToIncrease)
         {
             TickTimer += timeToIncrease;
-            if (TickTimer >= TickDuration)
+            while (TickTimer >= TickDuration)
             {
                 TickTimer -= TickDuration;
                 InvokeTimeTick();
