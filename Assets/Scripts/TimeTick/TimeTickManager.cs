@@ -70,6 +70,13 @@ namespace TimeTick
 
         public bool GetTickController(TimeTickIdentifier timeIdentifier, out TimeTickController tickController)
         {
+            if (timeIdentifier == TimeTickIdentifier.Custom)
+            {
+                Debug.LogWarning("Don't try to get custom one. Cache it before adding to list.");
+                tickController = null;
+                return false;
+            }
+
             tickController = _timeTickControllers.FirstOrDefault(x => x.TimeIdentifier == timeIdentifier);
             return tickController != null;
         }
