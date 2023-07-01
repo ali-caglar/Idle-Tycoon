@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Enums;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace TimeTick
     public class TimeTickManager
     {
         private List<TimeTickController> _timeTickControllers;
-        public List<TimeTickController> TimeTickControllers => _timeTickControllers;
+        public ReadOnlyCollection<TimeTickController> TimeTickControllers => _timeTickControllers.AsReadOnly();
 
         public TimeTickManager()
         {
