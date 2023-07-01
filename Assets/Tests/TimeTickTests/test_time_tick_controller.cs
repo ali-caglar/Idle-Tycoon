@@ -215,5 +215,21 @@ namespace Tests.TimeTickTests
                 }
             }
         }
+
+        [Test]
+        public void Should_Notify_Only_Once_Hence_We_UnSubscribe_After_Notified_After_Once()
+        {
+            int callCount = 0;
+            int totalTime = 1;
+            var controller = new TimeTickController(0, totalTime);
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 1;
+
+            controller.UpdateTimer(totalTime);
+            controller.RemoveAllListeners();
+            controller.UpdateTimer(totalTime);
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
     }
 }
