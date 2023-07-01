@@ -1,5 +1,7 @@
 using System;
 using Enums;
+using Extensions;
+using Helpers;
 using UnityEngine;
 
 namespace TimeTick
@@ -46,7 +48,7 @@ namespace TimeTick
             }
 
             TickTimer += timeToIncrease;
-            while (TickTimer >= TickDuration)
+            while (IsTimerExceededDuration())
             {
                 TickTimer -= TickDuration;
                 InvokeTimeTick();
@@ -61,7 +63,7 @@ namespace TimeTick
             }
 
             TickDuration = newTickDuration;
-            if (TickTimer >= TickDuration)
+            if (IsTimerExceededDuration())
             {
                 TickTimer = 0;
                 InvokeTimeTick();
@@ -76,6 +78,11 @@ namespace TimeTick
             {
                 OnTimeTick -= listener as Action;
             }
+        }
+
+        private bool IsTimerExceededDuration()
+        {
+            return TickTimer.IsExceeded(TickDuration);
         }
 
         private void InvokeTimeTick()
