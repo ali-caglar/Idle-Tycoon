@@ -1,8 +1,7 @@
 using System;
-using NSubstitute;
+using Extensions;
 using NUnit.Framework;
 using TimeTick;
-using UnityEngine;
 using UnityEngine.TestTools.Utils;
 
 namespace Tests.TimeTickTests
@@ -167,6 +166,54 @@ namespace Tests.TimeTickTests
             controller.UpdateTickDuration(newDuration);
 
             Assert.AreEqual(0, controller.TickTimer);
+        }
+
+        [Test]
+        public void Should_Notify_On_Update_Timer_Per_Duration_Exceeded()
+        {
+            foreach (var totalTime in _totalTimesToTest)
+            {
+                foreach (var timeToIncrease in _timesToAddToExceedTotalTimeOf1Second)
+                {
+                    int callCount = 0;
+                    var controller = new TimeTickController(0, totalTime);
+                    controller.OnTimeTick += () => callCount++;
+                    int expectedResult = 0;
+                    var temp = timeToIncrease;
+
+                    while (temp.IsExceeded(totalTime))
+                    {
+                        temp -= totalTime;
+                        expectedResult++;
+                    }
+
+                    controller.UpdateTimer(timeToIncrease);
+
+                    Assert.That(callCount, Is.EqualTo(expectedResult),
+                        $"increase: {timeToIncrease}, total: {totalTime}, timer: {controller.TickTimer}");
+                }
+            }
+        }
+
+        [Test]
+        public void Should_Notify_Only_Once_On_Update_Duration_If_Duration_Exceeded()
+        {
+            foreach (var totalTime in _timesToAddToExceedTotalTimeOf1Second)
+            {
+                foreach (var newDuration in _totalTimesToTest)
+                {
+                    int callCount = 0;
+                    float startTime = totalTime / 2;
+                    var controller = new TimeTickController(totalTime / 2, totalTime);
+                    controller.OnTimeTick += () => callCount++;
+                    int expectedResult = startTime >= newDuration ? 1 : 0;
+
+                    controller.UpdateTickDuration(newDuration);
+
+                    Assert.That(callCount, Is.EqualTo(expectedResult),
+                        $"newDuration: {newDuration}, total: {totalTime}, timer: {controller.TickTimer}");
+                }
+            }
         }
     }
 }
