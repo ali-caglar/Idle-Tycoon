@@ -1,13 +1,11 @@
 using NUnit.Framework;
 using TimeTick;
-using UnityEngine;
 using UnityEngine.TestTools.Utils;
 
 namespace Tests.TimeTickTests
 {
     public class test_time_tick_controller
     {
-        private float _floatingPointTolerance = 0.0001f;
         private float[] _expectedPercentages = { 0.1f, 0.25f, 0.5f, 0.6f, 0.99f };
 
         private float[] _totalTimesToTest =
