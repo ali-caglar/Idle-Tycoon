@@ -19,7 +19,7 @@ namespace Currency
 
         public void AddAmount(BigDouble amountToAdd)
         {
-            CurrentAmount.Add(amountToAdd);
+            CurrentAmount += amountToAdd;
             InvokeAmountChange();
         }
 
@@ -27,7 +27,7 @@ namespace Currency
         {
             if (HasEnoughAmount(amountToSubtract))
             {
-                CurrentAmount.Subtract(amountToSubtract);
+                CurrentAmount -= amountToSubtract;
                 InvokeAmountChange();
             }
         }
