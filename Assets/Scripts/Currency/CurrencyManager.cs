@@ -17,7 +17,7 @@ namespace Currency
             _currencyControllerDictionary = new Dictionary<CurrencyType, CurrencyController>
             {
                 [CurrencyType.Money] = new(CurrencyType.Money, new BigDouble(Constants.MoneyStartValue)),
-                [CurrencyType.Gem] = new(CurrencyType.Gem, new BigDouble(0)),
+                [CurrencyType.Gem] = new(CurrencyType.Gem, new BigDouble(Constants.GemStartValue)),
             };
         }
 
