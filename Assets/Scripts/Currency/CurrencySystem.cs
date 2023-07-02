@@ -19,6 +19,11 @@ namespace Currency
             _currencyManager.RemoveAllListeners();
         }
 
+        public BigDouble GetCurrentAmount(CurrencyType currencyType)
+        {
+            return _currencyManager.GetCurrentAmount(currencyType);
+        }
+
         public void AddAmount(CurrencyType currencyTypeToAdd, BigDouble amountToAdd)
         {
             _currencyManager.AddAmount(currencyTypeToAdd, amountToAdd);

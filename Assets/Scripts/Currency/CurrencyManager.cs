@@ -21,6 +21,12 @@ namespace Currency
             };
         }
 
+        public BigDouble GetCurrentAmount(CurrencyType currencyType)
+        {
+            var currencyController = GetCurrencyController(currencyType);
+            return currencyController.CurrentAmount;
+        }
+
         public void AddAmount(CurrencyType currencyTypeToAdd, BigDouble amountToAdd)
         {
             var currencyController = GetCurrencyController(currencyTypeToAdd);
