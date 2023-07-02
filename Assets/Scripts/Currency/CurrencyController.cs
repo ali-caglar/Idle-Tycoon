@@ -1,6 +1,7 @@
 using System;
 using BreakInfinity;
 using Enums;
+using UnityEngine;
 
 namespace Currency
 {
@@ -13,18 +14,36 @@ namespace Currency
 
         public CurrencyController(CurrencyType currencyType, BigDouble currentAmount)
         {
+            if (currentAmount < 0)
+            {
+                currentAmount = 0;
+                Debug.LogWarning("Tried to initiate money with negative value.");
+            }
+
             CurrencyType = currencyType;
             CurrentAmount = currentAmount;
         }
 
         public void AddAmount(BigDouble amountToAdd)
         {
+            if (CheckForNegativeValue(amountToAdd))
+            {
+                Debug.LogWarning("Negative values are not handled.");
+                return;
+            }
+
             CurrentAmount += amountToAdd;
             InvokeAmountChange();
         }
 
         public void SubtractAmount(BigDouble amountToSubtract)
         {
+            if (CheckForNegativeValue(amountToSubtract))
+            {
+                Debug.LogWarning("Negative values are not handled.");
+                return;
+            }
+
             if (HasEnoughAmount(amountToSubtract))
             {
                 CurrentAmount -= amountToSubtract;
@@ -45,6 +64,11 @@ namespace Currency
             {
                 OnAmountChanged -= listener as Action<BigDouble>;
             }
+        }
+
+        private bool CheckForNegativeValue(BigDouble value)
+        {
+            return value < 0;
         }
 
         private void InvokeAmountChange()
