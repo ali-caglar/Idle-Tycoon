@@ -63,7 +63,7 @@ namespace Tests.TimeTickTests
                     float expectedResult = timeToIncrease;
 
                     // Calculating with modulus is returning bullshit
-                    while (expectedResult >= totalTime)
+                    while (expectedResult.IsExceeded(totalTime))
                     {
                         expectedResult -= totalTime;
                     }
