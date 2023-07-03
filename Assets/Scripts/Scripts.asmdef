@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
     "name": "Scripts",
     "rootNamespace": "",
     "references": [
@@ -15,7 +14,3 @@
     "versionDefines": [],
     "noEngineReferences": false
 }
-=======
-	"name": "Scripts"
-}
->>>>>>> systems/tick-system

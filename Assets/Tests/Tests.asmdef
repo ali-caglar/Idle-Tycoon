@@ -4,12 +4,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-<<<<<<< HEAD
-        "Scripts",
-        "NewAssembly"
-=======
+        "NewAssembly",
         "Scripts"
->>>>>>> systems/tick-system
     ],
     "includePlatforms": [
         "Editor"
