@@ -1,5 +1,6 @@
 using System;
 using Extensions;
+using Helpers;
 using NUnit.Framework;
 using TimeTick;
 using UnityEngine.TestTools.Utils;
@@ -52,7 +53,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Exceeded_Timer_Reduced_By_Total_Duration()
         {
-            var comparer = new FloatEqualityComparer(1e-6f);
+            var comparer = new FloatEqualityComparer(Constants.FloatingPointTolerance);
 
             foreach (var totalTime in _totalTimesToTest)
             {
