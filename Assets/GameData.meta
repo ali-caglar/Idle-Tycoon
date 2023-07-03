@@ -1,13 +1,9 @@
 fileFormatVersion: 2
-<<<<<<< HEAD
 <<<<<<<< HEAD:Assets/Scripts.meta
 guid: f494a267f85264477b4fde3405ab0473
 ========
 guid: 026464f8656574c6081c89dd9e2b4219
 >>>>>>>> systems/tick-system:Assets/GameData.meta
-=======
-guid: 4f559b6d31bf9483cbee90da43a18ae0
->>>>>>> systems/tick-system
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
