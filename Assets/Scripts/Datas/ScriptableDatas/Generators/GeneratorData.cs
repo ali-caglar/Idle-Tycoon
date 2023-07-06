@@ -24,6 +24,18 @@ namespace Datas.ScriptableDatas.Generators
                 return _dataModelToUse;
             }
         }
+        public UserDataForGeneratorDataModel UserData
+        {
+            get
+            {
+                if (_userData == null)
+                {
+                    Load();
+                }
+
+                return _userData;
+            }
+        }
 
         #region Save&Load
 
