@@ -25,6 +25,16 @@ namespace TimeTick
             _timeTickManager.RemoveAllListeners();
         }
 
+        public void AddNewTimeTick(TimeTickController timeTickController)
+        {
+            _timeTickManager.AddNewTickController(timeTickController);
+        }
+
+        public void RemoveTimeTick(TimeTickController timeTickController)
+        {
+            _timeTickManager.RemoveTickController(timeTickController);
+        }
+
         public void SubscribeToPreDefinedTimeTick(TimeTickIdentifier timeIdentifier, Action timeTickHandler)
         {
             if (timeIdentifier == TimeTickIdentifier.Custom) return;
