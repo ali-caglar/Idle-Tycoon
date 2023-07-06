@@ -53,6 +53,7 @@ namespace TimeTick
 
             if (_timeTickControllers.Contains(timeTickController))
             {
+                timeTickController.RemoveAllListeners();
                 _timeTickControllers.Remove(timeTickController);
             }
             else
