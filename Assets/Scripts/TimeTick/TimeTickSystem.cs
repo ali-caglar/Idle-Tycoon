@@ -6,39 +6,63 @@ namespace TimeTick
 {
     public class TimeTickSystem : MonoBehaviour
     {
+        #region PRIVATE FIELDS
+
         private bool _isGameStarted;
         private TimeTickManager _timeTickManager;
 
+        #endregion
+
+        #region PROPERTIES
+
+        // Encapsulated for if any other class initialized before this class, field will be initialized by this property.
+        private TimeTickManager TickManager
+        {
+            get
+            {
+                _timeTickManager ??= new TimeTickManager();
+                return _timeTickManager;
+            }
+        }
+
+        #endregion
+
+        #region MONOBEHAVIOUR
+
         private void Awake()
         {
-            _timeTickManager = new TimeTickManager();
+            _timeTickManager ??= new TimeTickManager();
         }
 
         private void Update()
         {
             if (!_isGameStarted) return;
-            _timeTickManager.UpdateTimers(Time.deltaTime);
+            TickManager.UpdateTimers(Time.deltaTime);
         }
 
         private void OnDestroy()
         {
-            _timeTickManager.RemoveAllListeners();
+            TickManager.RemoveAllListeners();
         }
+
+        #endregion
+
+        #region PUBLIC METHODS
 
         public void AddNewTimeTick(TimeTickController timeTickController)
         {
-            _timeTickManager.AddNewTickController(timeTickController);
+            TickManager.AddNewTickController(timeTickController);
         }
 
         public void RemoveTimeTick(TimeTickController timeTickController)
         {
-            _timeTickManager.RemoveTickController(timeTickController);
+            TickManager.RemoveTickController(timeTickController);
         }
 
         public void SubscribeToPreDefinedTimeTick(TimeTickIdentifier timeIdentifier, Action timeTickHandler)
         {
             if (timeIdentifier == TimeTickIdentifier.Custom) return;
-            if (_timeTickManager.GetTickController(timeIdentifier, out TimeTickController tickController))
+            if (TickManager.GetTickController(timeIdentifier, out TimeTickController tickController))
             {
                 tickController.OnTimeTick += timeTickHandler;
             }
@@ -47,10 +71,12 @@ namespace TimeTick
         public void UnSubscribeFromPreDefinedTimeTick(TimeTickIdentifier timeIdentifier, Action timeTickHandler)
         {
             if (timeIdentifier == TimeTickIdentifier.Custom) return;
-            if (_timeTickManager.GetTickController(timeIdentifier, out TimeTickController tickController))
+            if (TickManager.GetTickController(timeIdentifier, out TimeTickController tickController))
             {
                 tickController.OnTimeTick -= timeTickHandler;
             }
         }
+
+        #endregion
     }
 }
