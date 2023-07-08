@@ -14,14 +14,15 @@ namespace Generators
         #region Private Getters From Generator Data
 
         private ulong CurrentLevel => generatorData.UserData.CurrentLevel;
-        private float TickDuration => generatorData.DataModel.profitDataModel.durationToEarnProfit;
+        private float InitialTickDuration => generatorData.DataModel.profitDataModel.durationToEarnProfit;
         private BigDouble ProfitPerLevel => generatorData.DataModel.profitDataModel.profitPerLevel;
 
         #endregion
 
-        private void Awake()
+        public void Initialize(TimeTickSystem tickSystem)
         {
-            
+            _tickSystem = tickSystem;
+            InitController();
         }
 
         public BigDouble GetProductionPerTick()
@@ -31,7 +32,16 @@ namespace Generators
 
         public BigDouble GetProductionPerSecond()
         {
-            return GetProductionPerTick() / TickDuration;
+            return GetProductionPerTick() / InitialTickDuration;
+        }
+
+        private void InitController()
+        {
+            if (generatorData.UserData.IsUnlocked)
+            {
+                var timeTickController = new TimeTickController(0, InitialTickDuration);
+                _tickSystem.AddNewTimeTick(timeTickController);
+            }
         }
     }
 }
