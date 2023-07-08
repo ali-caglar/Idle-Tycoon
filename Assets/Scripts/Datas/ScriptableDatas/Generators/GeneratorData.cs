@@ -12,6 +12,17 @@ namespace Datas.ScriptableDatas.Generators
         private GeneratorDataModel _dataModelToUse;
         private UserDataForGeneratorDataModel _userData;
 
+        private void OnEnable()
+        {
+            Load();
+        }
+
+        private void OnDisable()
+        {
+            _userData = null;
+            _dataModelToUse = null;
+        }
+
         public GeneratorDataModel DataModel
         {
             get
