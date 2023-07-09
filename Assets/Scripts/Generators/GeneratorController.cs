@@ -23,12 +23,18 @@ namespace Generators
         [SerializeField] private GeneratorData generatorData;
 
         #endregion
+
+        #region PRIVATE FIELDS
+
+        private TimeTickController _timeTickController;
+
         // Dependencies
         private GeneratorManager _generatorManager;
         private TimeTickSystem _timeSystem;
         private CurrencySystem _currencySystem;
 
-        #region Private Getters From Generator Data
+        #endregion
+
         #region PUBLIC PROPERTIES
 
         public BigDouble ProductionPerTick => GetProductionPerTick();
@@ -55,12 +61,19 @@ namespace Generators
             InitController();
         }
 
-        public BigDouble GetProductionPerTick()
+        private void InitController()
         {
-            return ProfitPerLevel * CurrentLevel;
+            if (UserData.IsUnlocked)
+            {
+                _timeTickController = new TimeTickController(0, ProfitData.durationToEarnProfit);
+                _timeTickController.OnTimeTick += AddProductionToCurrencyController;
+
+                _timeSystem.AddNewTimeTick(_timeTickController);
+            }
         }
 
-        public BigDouble GetProductionPerSecond()
+        #endregion
+
         #region PUBLIC METHODS
 
         public void UnlockGenerator()
