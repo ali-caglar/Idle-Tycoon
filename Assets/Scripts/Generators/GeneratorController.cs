@@ -14,7 +14,10 @@ namespace Generators
     {
         [SerializeField] private GeneratorData generatorData;
 
-        private TimeTickSystem _tickSystem;
+        // Dependencies
+        private GeneratorManager _generatorManager;
+        private TimeTickSystem _timeSystem;
+        private CurrencySystem _currencySystem;
 
         #region Private Getters From Generator Data
 
@@ -24,9 +27,14 @@ namespace Generators
 
         #endregion
 
-        public void Initialize(TimeTickSystem tickSystem)
+        #region INITIALIZER
+
+        public void Initialize(GeneratorManager generatorManager, TimeTickSystem timeSystem,
+            CurrencySystem currencySystem)
         {
-            _tickSystem = tickSystem;
+            _generatorManager = generatorManager;
+            _timeSystem = timeSystem;
+            _currencySystem = currencySystem;
             InitController();
         }
 
