@@ -10,6 +10,7 @@ namespace Datas.ScriptableDatas.Generators
     {
         #region SERIALIZED PRIVATE FIELDS
 
+        [SerializeField] private CurrencyType costType;
         [SerializeField] private CurrencyType productionType;
         [SerializeField] private GeneratorDataModel dataModelOnDeploy;
 
@@ -24,6 +25,7 @@ namespace Datas.ScriptableDatas.Generators
 
         #region PROPERTIES
 
+        public CurrencyType CostType => costType;
         public CurrencyType ProductionType => productionType;
 
         public GeneratorDataModel DataModel
