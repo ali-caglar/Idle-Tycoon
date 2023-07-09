@@ -44,9 +44,18 @@ namespace Generators
 
         #endregion
 
+        #region PRIVATE PROPERTIES
+
+        // Getters from GeneratorManager
+        private float ProfitMultiplierFromBonus => 1;
+
+        // Getters from generator data
+        private CurrencyType CostType => generatorData.CostType;
+        private CurrencyType ProductionType => generatorData.ProductionType;
         private ulong CurrentLevel => generatorData.UserData.CurrentLevel;
-        private float InitialTickDuration => generatorData.DataModel.profitDataModel.durationToEarnProfit;
-        private BigDouble ProfitPerLevel => generatorData.DataModel.profitDataModel.profitPerLevel;
+        private UserDataForGeneratorDataModel UserData => generatorData.UserData;
+        private GeneratorCostDataModel CostData => generatorData.DataModel.costDataModel;
+        private GeneratorProfitDataModel ProfitData => generatorData.DataModel.profitDataModel;
 
         #endregion
 
