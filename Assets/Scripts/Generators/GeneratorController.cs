@@ -114,5 +114,38 @@ namespace Generators
         }
 
         #endregion
+
+        #region PRIVATE METHODS
+
+        private void AddProductionToCurrencyController()
+        {
+            var amountToAdd = GetProductionPerTick();
+            _currencySystem.AddAmount(ProductionType, amountToAdd);
+        }
+
+        private BigDouble GetProductionPerTick()
+        {
+            return (CurrentLevel * ProfitMultiplierFromBonus) * ProfitData.profitPerLevel;
+        }
+
+        private BigDouble GetProductionPerSecond()
+        {
+            return GetProductionPerTick() / ProfitData.durationToEarnProfit;
+        }
+
+        private BigDouble GetUnlockCost()
+        {
+            return CostData.baseCost;
+        }
+
+        private BigDouble GetNextCost()
+        {
+            var buyOption = _generatorManager.BuyOption;
+            var currentMoney = _currencySystem.GetCurrentAmount(CostType);
+            var amountToBuy = Calculator.CalculateAmountToBuy(buyOption, CostData, CurrentLevel, currentMoney);
+            return Calculator.GetGeneratorCost(CostData, amountToBuy, CurrentLevel);
+        }
+
+        #endregion
     }
 }
