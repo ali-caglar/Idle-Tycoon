@@ -12,8 +12,17 @@ namespace Generators
 {
     public class GeneratorController : MonoBehaviour
     {
+        #region EVENTS
+
+        public event Action OnGeneratorBought;
+
+        #endregion
+
+        #region SERIALIZED PRIVATE FIELDS
+
         [SerializeField] private GeneratorData generatorData;
 
+        #endregion
         // Dependencies
         private GeneratorManager _generatorManager;
         private TimeTickSystem _timeSystem;
