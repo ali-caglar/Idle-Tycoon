@@ -1,5 +1,6 @@
 using Datas.DataModels.Generators;
 using Datas.ScriptableDatas.Common;
+using Enums;
 using UnityEngine;
 
 namespace Datas.ScriptableDatas.Generators
@@ -7,6 +8,7 @@ namespace Datas.ScriptableDatas.Generators
     [CreateAssetMenu(fileName = "Generator Data", menuName = "Datas/Generator/Generator Data", order = 0)]
     public class GeneratorData : DataHandlerScriptableObject
     {
+        [SerializeField] private CurrencyType productionType;
         [SerializeField] private GeneratorDataModel dataModelOnDeploy;
 
         private GeneratorDataModel _dataModelToUse;
