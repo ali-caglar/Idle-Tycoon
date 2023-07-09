@@ -71,6 +71,15 @@ namespace Datas.ScriptableDatas.Generators
 
 #if UNITY_EDITOR
 
+        private void OnValidate()
+        {
+            var identifierID = dataModelOnDeploy.identifierID;
+            if (string.IsNullOrEmpty(identifierID) || !identifierID.Contains(productionType.ToString().ToLower()))
+            {
+                dataModelOnDeploy.identifierID = $"generator-{productionType.ToString().ToLower()}-{System.Guid.NewGuid()}";
+            }
+        }
+
 #endif
 
         #endregion
