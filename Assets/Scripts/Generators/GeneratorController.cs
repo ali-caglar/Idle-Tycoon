@@ -1,5 +1,10 @@
+using System;
 using BreakInfinity;
+using Currency;
+using Datas.DataModels.Generators;
 using Datas.ScriptableDatas.Generators;
+using Enums;
+using Helpers;
 using TimeTick;
 using UnityEngine;
 
@@ -31,17 +36,36 @@ namespace Generators
         }
 
         public BigDouble GetProductionPerSecond()
-        {
-            return GetProductionPerTick() / InitialTickDuration;
-        }
+        #region PUBLIC METHODS
 
-        private void InitController()
+        public void UnlockGenerator()
         {
-            if (generatorData.UserData.IsUnlocked)
+            if (UserData.IsUnlocked) return;
+
+            var unlockCost = GetUnlockCost();
+            if (_currencySystem.HasEnoughAmount(CostType, unlockCost))
             {
-                var timeTickController = new TimeTickController(0, InitialTickDuration);
-                _tickSystem.AddNewTimeTick(timeTickController);
+                UserData.IsUnlocked = true;
+                generatorData.Save();
+                _currencySystem.SubtractAmount(CostType, unlockCost);
+                OnGeneratorBought?.Invoke();
             }
         }
+
+        public void BuyGenerator()
+        {
+            if (!UserData.IsUnlocked) return;
+
+            var unlockCost = GetNextCost();
+            if (_currencySystem.HasEnoughAmount(CostType, unlockCost))
+            {
+                UserData.CurrentLevel++;
+                generatorData.Save();
+                _currencySystem.SubtractAmount(CostType, unlockCost);
+                OnGeneratorBought?.Invoke();
+            }
+        }
+
+        #endregion
     }
 }
