@@ -20,6 +20,14 @@ namespace Generators
         private CurrencySystem _currencySystem;
 
         #region Private Getters From Generator Data
+        #region PUBLIC PROPERTIES
+
+        public BigDouble ProductionPerTick => GetProductionPerTick();
+        public BigDouble ProductionPerSecond => GetProductionPerSecond();
+        public BigDouble UnlockCost => GetUnlockCost();
+        public BigDouble NextCost => GetNextCost();
+
+        #endregion
 
         private ulong CurrentLevel => generatorData.UserData.CurrentLevel;
         private float InitialTickDuration => generatorData.DataModel.profitDataModel.durationToEarnProfit;
