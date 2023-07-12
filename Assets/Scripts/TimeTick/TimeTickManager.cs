@@ -15,11 +15,11 @@ namespace TimeTick
         {
             _timeTickControllers = new List<TimeTickController>
             {
-                new(0, 1, TimeTickIdentifier.Second1),
-                new(0, 2, TimeTickIdentifier.Second2),
-                new(0, 3, TimeTickIdentifier.Second3),
-                new(0, 5, TimeTickIdentifier.Second5),
-                new(0, 10, TimeTickIdentifier.Second10),
+                new(0, 1, true, TimeTickIdentifier.Second1),
+                new(0, 2, true, TimeTickIdentifier.Second2),
+                new(0, 3, true, TimeTickIdentifier.Second3),
+                new(0, 5, true, TimeTickIdentifier.Second5),
+                new(0, 10, true, TimeTickIdentifier.Second10),
             };
         }
 
