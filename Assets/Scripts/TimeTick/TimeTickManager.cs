@@ -8,22 +8,42 @@ namespace TimeTick
 {
     public class TimeTickManager
     {
+        #region PRIVATE FIELDS
+
         private List<TimeTickController> _timeTickControllers;
+
+        #endregion
+
+        #region PROPERTIES
+
         public ReadOnlyCollection<TimeTickController> TimeTickControllers => _timeTickControllers.AsReadOnly();
+
+        #endregion
+
+        #region CONSTRUCTOR
 
         public TimeTickManager()
         {
             _timeTickControllers = new List<TimeTickController>
             {
-                new(0, 1, TimeTickIdentifier.Second1),
-                new(0, 2, TimeTickIdentifier.Second2),
-                new(0, 3, TimeTickIdentifier.Second3),
-                new(0, 5, TimeTickIdentifier.Second5),
-                new(0, 10, TimeTickIdentifier.Second10),
+                new(0, 1, true, TimeTickIdentifier.Second1),
+                new(0, 2, true, TimeTickIdentifier.Second2),
+                new(0, 3, true, TimeTickIdentifier.Second3),
+                new(0, 5, true, TimeTickIdentifier.Second5),
+                new(0, 10, true, TimeTickIdentifier.Second10),
             };
         }
 
-        public void AddNewTickController(TimeTickController timeTickController)
+        #endregion
+
+        #region PUBLIC METHODS
+
+        /// <summary>
+        /// Adds new custom tick controller.
+        /// Can't add the same custom controller or new controller with a pre-defined identifier.
+        /// </summary>
+        /// <param name="timeTickController">Controller to add</param>
+        public void AddNewCustomTickController(TimeTickController timeTickController)
         {
             if (timeTickController.TimeIdentifier != TimeTickIdentifier.Custom)
             {
@@ -42,7 +62,12 @@ namespace TimeTick
             }
         }
 
-        public void RemoveTickController(TimeTickController timeTickController)
+        /// <summary>
+        /// Removes custom tick controller which is added already.
+        /// Can't remove the pre-defined controllers.
+        /// </summary>
+        /// <param name="timeTickController">Controller to remove</param>
+        public void RemoveCustomTickController(TimeTickController timeTickController)
         {
             if (_timeTickControllers == null || _timeTickControllers.Count == 0) return;
             if (timeTickController.TimeIdentifier != TimeTickIdentifier.Custom)
@@ -62,6 +87,10 @@ namespace TimeTick
             }
         }
 
+        /// <summary>
+        /// Increases the timers by given parameter.
+        /// </summary>
+        /// <param name="timeToIncrease">Increase by value</param>
         public void UpdateTimers(float timeToIncrease)
         {
             foreach (var tickController in _timeTickControllers)
@@ -70,7 +99,14 @@ namespace TimeTick
             }
         }
 
-        public bool GetTickController(TimeTickIdentifier timeIdentifier, out TimeTickController tickController)
+        /// <summary>
+        /// Finds pre-defined controller.
+        /// Don't try to find custom one. Cache it before adding to list.
+        /// </summary>
+        /// <param name="timeIdentifier">Identifier of the controller</param>
+        /// <param name="tickController">Requested time tick controller</param>
+        /// <returns>True unless requested identifier is 'Custom'</returns>
+        public bool GetPreDefinedTickController(TimeTickIdentifier timeIdentifier, out TimeTickController tickController)
         {
             if (timeIdentifier == TimeTickIdentifier.Custom)
             {
@@ -83,6 +119,9 @@ namespace TimeTick
             return tickController != null;
         }
 
+        /// <summary>
+        /// Removes all the event listener from all of the controllers.
+        /// </summary>
         public void RemoveAllListeners()
         {
             foreach (var tickData in _timeTickControllers)
@@ -90,5 +129,7 @@ namespace TimeTick
                 tickData.RemoveAllListeners();
             }
         }
+
+        #endregion
     }
 }

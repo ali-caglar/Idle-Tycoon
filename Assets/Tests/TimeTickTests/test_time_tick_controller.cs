@@ -26,7 +26,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Time_Updated()
         {
-            var controller = new TimeTickController(0, 1);
+            var controller = new TimeTickController(0, 1, true);
             float timeToIncrease = 0.1f;
 
             controller.UpdateTimer(timeToIncrease);
@@ -41,7 +41,7 @@ namespace Tests.TimeTickTests
 
             foreach (var expectedPercentage in _expectedPercentages)
             {
-                var controller = new TimeTickController(0, totalTime);
+                var controller = new TimeTickController(0, totalTime, true);
                 float timeToIncrease = totalTime * expectedPercentage;
 
                 controller.UpdateTimer(timeToIncrease);
@@ -59,7 +59,7 @@ namespace Tests.TimeTickTests
             {
                 foreach (var timeToIncrease in _timesToAddToExceedTotalTimeOf1Second)
                 {
-                    var controller = new TimeTickController(0, totalTime);
+                    var controller = new TimeTickController(0, totalTime, true);
                     float expectedResult = timeToIncrease;
 
                     // Calculating with modulus is returning bullshit
@@ -78,7 +78,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Timer_Less_Than_Duration_On_Init()
         {
-            var controller = new TimeTickController(1.5f, 1);
+            var controller = new TimeTickController(1.5f, 1, true);
 
             Assert.Less(controller.TickTimer, controller.TickDuration);
         }
@@ -86,7 +86,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Timer_Greater_or_Equal_To_0()
         {
-            var controller = new TimeTickController(-1f, 1);
+            var controller = new TimeTickController(-1f, 1, true);
 
             Assert.GreaterOrEqual(0, controller.TickTimer);
         }
@@ -96,7 +96,7 @@ namespace Tests.TimeTickTests
         {
             void CreateNewController()
             {
-                var controller = new TimeTickController(0, 0);
+                var controller = new TimeTickController(0, 0, true);
             }
 
             Assert.Throws<Exception>(CreateNewController, "Should have throw error.");
@@ -107,7 +107,7 @@ namespace Tests.TimeTickTests
         {
             void CreateNewController()
             {
-                var controller = new TimeTickController(0, -1f);
+                var controller = new TimeTickController(0, -1f, true);
             }
 
             Assert.Throws<Exception>(CreateNewController, "Should have throw error.");
@@ -116,7 +116,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Throw_Error_Updating_Controller_With_0_Duration()
         {
-            var controller = new TimeTickController(0, 1);
+            var controller = new TimeTickController(0, 1, true);
 
             void UpdateControllerDuration()
             {
@@ -129,7 +129,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Throw_Error_Updating_Controller_Less_Than_0_Duration()
         {
-            var controller = new TimeTickController(0, 1f);
+            var controller = new TimeTickController(0, 1f, true);
 
             void UpdateControllerDuration()
             {
@@ -142,7 +142,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Update_Tick_Duration()
         {
-            var controller = new TimeTickController(0, 1);
+            var controller = new TimeTickController(0, 1, true);
             float newDuration = 0.5f;
             controller.UpdateTickDuration(newDuration);
 
@@ -152,7 +152,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Time_Increase_Always_Greater_Than_0()
         {
-            var controller = new TimeTickController(0, 1);
+            var controller = new TimeTickController(0, 1, true);
             float timeToSubtract = -0.5f;
             controller.UpdateTimer(timeToSubtract);
 
@@ -162,7 +162,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Reset_After_Updated_Tick_Duration_If_Exceeded()
         {
-            var controller = new TimeTickController(0.6f, 1);
+            var controller = new TimeTickController(0.6f, 1, true);
             float newDuration = 0.5f;
             controller.UpdateTickDuration(newDuration);
 
@@ -177,7 +177,7 @@ namespace Tests.TimeTickTests
                 foreach (var timeToIncrease in _timesToAddToExceedTotalTimeOf1Second)
                 {
                     int callCount = 0;
-                    var controller = new TimeTickController(0, totalTime);
+                    var controller = new TimeTickController(0, totalTime, true);
                     controller.OnTimeTick += () => callCount++;
                     int expectedResult = 0;
                     var temp = timeToIncrease;
@@ -205,7 +205,7 @@ namespace Tests.TimeTickTests
                 {
                     int callCount = 0;
                     float startTime = totalTime / 2;
-                    var controller = new TimeTickController(totalTime / 2, totalTime);
+                    var controller = new TimeTickController(totalTime / 2, totalTime, true);
                     controller.OnTimeTick += () => callCount++;
                     int expectedResult = startTime >= newDuration ? 1 : 0;
 
@@ -222,13 +222,126 @@ namespace Tests.TimeTickTests
         {
             int callCount = 0;
             int totalTime = 1;
-            var controller = new TimeTickController(0, totalTime);
+            var controller = new TimeTickController(0, totalTime, true);
             controller.OnTimeTick += () => callCount++;
             int expectedResult = 1;
 
             controller.UpdateTimer(totalTime);
             controller.RemoveAllListeners();
             controller.UpdateTimer(totalTime);
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controllers_Not_Renew_Timer_After_Duration_Update()
+        {
+            foreach (var totalTime in _timesToAddToExceedTotalTimeOf1Second)
+            {
+                foreach (var newDuration in _totalTimesToTest)
+                {
+                    int callCount = 0;
+                    float startTime = totalTime / 2;
+                    var controller = new TimeTickController(startTime, totalTime, false);
+                    controller.OnTimeTick += () => callCount++;
+                    int expectedResult = 0;
+
+                    controller.UpdateTickDuration(newDuration);
+
+                    Assert.That(callCount, Is.EqualTo(expectedResult),
+                        $"newDuration: {newDuration}, total: {totalTime}, timer: {controller.TickTimer}");
+                }
+            }
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controllers_Not_Renew_Timer_After_Time_Update()
+        {
+            foreach (var totalTime in _totalTimesToTest)
+            {
+                foreach (var timeToIncrease in _timesToAddToExceedTotalTimeOf1Second)
+                {
+                    int callCount = 0;
+                    float startTime = totalTime / 2;
+                    var controller = new TimeTickController(startTime, totalTime, false);
+                    controller.OnTimeTick += () => callCount++;
+                    int expectedResult = 0;
+
+                    controller.UpdateTimer(timeToIncrease);
+
+                    Assert.That(callCount, Is.EqualTo(expectedResult),
+                        $"timer: {controller.TickTimer}, total: {totalTime}, invoked time: {callCount}");
+                }
+            }
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controller_Not_Renew_Timer_If_Time_Not_Exceeds_After_Time_Update()
+        {
+            var controller = new TimeTickController(0, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 0;
+
+            controller.UpdateTimer(0.2f);
+            controller.RenewTimer();
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controller_Not_Renew_Timer_If_Time_Not_Exceeds_After_Duration_Update()
+        {
+            var controller = new TimeTickController(0, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 0;
+
+            controller.UpdateTickDuration(0.5f);
+            controller.RenewTimer();
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controller_Renew_Timer_If_Time_Exceeds_After_Time_Update()
+        {
+            var controller = new TimeTickController(0, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 1;
+
+            controller.UpdateTimer(1.5f);
+            controller.RenewTimer();
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controller_Renew_Timer_If_Time_Exceeds_After_Duration_Update()
+        {
+            var controller = new TimeTickController(0.5f, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 1;
+
+            controller.UpdateTickDuration(0.2f);
+            controller.RenewTimer();
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Set_Automation_Renew_Timer_After_Next_Time_Update()
+        {
+            var controller = new TimeTickController(0.5f, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 1;
+
+            controller.UpdateTimer(1f);
+            controller.SetAutomation(true);
+            controller.UpdateTimer(0.1f);
 
             Assert.That(callCount, Is.EqualTo(expectedResult));
         }
