@@ -1,6 +1,5 @@
 using Datas.DataModels.Generators;
 using Datas.ScriptableDatas.Common;
-using Enums;
 using UnityEngine;
 
 namespace Datas.ScriptableDatas.Generators
@@ -10,8 +9,6 @@ namespace Datas.ScriptableDatas.Generators
     {
         #region SERIALIZED PRIVATE FIELDS
 
-        [SerializeField] private CurrencyType costType;
-        [SerializeField] private CurrencyType productionType;
         [SerializeField] private GeneratorDataModel dataModelOnDeploy;
 
         #endregion
@@ -24,9 +21,6 @@ namespace Datas.ScriptableDatas.Generators
         #endregion
 
         #region PROPERTIES
-
-        public CurrencyType CostType => costType;
-        public CurrencyType ProductionType => productionType;
 
         public GeneratorDataModel DataModel
         {
@@ -95,10 +89,10 @@ namespace Datas.ScriptableDatas.Generators
         private void OnValidate()
         {
             var identifierID = dataModelOnDeploy.identifierID;
-            if (string.IsNullOrEmpty(identifierID) || !identifierID.Contains(productionType.ToString().ToLower()))
+            var productionType = dataModelOnDeploy.profitDataModel.profitCurrencyType.ToString().ToLower();
+            if (string.IsNullOrEmpty(identifierID) || !identifierID.Contains(productionType))
             {
-                dataModelOnDeploy.identifierID =
-                    $"generator-{productionType.ToString().ToLower()}-{System.Guid.NewGuid()}";
+                dataModelOnDeploy.identifierID = $"generator-{productionType}-{System.Guid.NewGuid()}";
             }
         }
 

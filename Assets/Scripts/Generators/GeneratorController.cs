@@ -50,8 +50,8 @@ namespace Generators
         private float ProfitMultiplierFromBonus => 1;
 
         // Getters from generator data
-        private CurrencyType CostType => generatorData.CostType;
-        private CurrencyType ProductionType => generatorData.ProductionType;
+        private CurrencyType CostType => generatorData.DataModel.costDataModel.costCurrencyType;
+        private CurrencyType ProductionType => generatorData.DataModel.profitDataModel.profitCurrencyType;
         private ulong CurrentLevel => generatorData.UserData.CurrentLevel;
         private UserDataForGeneratorDataModel UserData => generatorData.UserData;
         private GeneratorCostDataModel CostData => generatorData.DataModel.costDataModel;
