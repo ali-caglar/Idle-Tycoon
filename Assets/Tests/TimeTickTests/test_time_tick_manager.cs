@@ -17,12 +17,12 @@ namespace Tests.TimeTickTests
             {
                 if (identifier == TimeTickIdentifier.Custom)
                 {
-                    Assert.False(manager.GetTickController(identifier, out TimeTickController tickController),
+                    Assert.False(manager.GetPreDefinedTickController(identifier, out TimeTickController tickController),
                         "Custom identifier shouldn't be added to the list on construction");
                 }
                 else
                 {
-                    Assert.True(manager.GetTickController(identifier, out TimeTickController tickController),
+                    Assert.True(manager.GetPreDefinedTickController(identifier, out TimeTickController tickController),
                         $"There's missing identifier: {identifier.ToString()}");
                 }
             }
@@ -44,8 +44,8 @@ namespace Tests.TimeTickTests
         {
             var manager = new TimeTickManager();
 
-            TimeTickController newController = new TimeTickController(0, 3, TimeTickIdentifier.Custom);
-            manager.AddNewTickController(newController);
+            TimeTickController newController = new TimeTickController(0, 3, true, TimeTickIdentifier.Custom);
+            manager.AddNewCustomTickController(newController);
 
             Assert.Contains(newController, manager.TimeTickControllers,
                 "Custom controller couldn't added for no reason");
@@ -56,9 +56,9 @@ namespace Tests.TimeTickTests
         {
             var manager = new TimeTickManager();
 
-            TimeTickController newController = new TimeTickController(0, 3, TimeTickIdentifier.Custom);
-            manager.AddNewTickController(newController);
-            manager.RemoveTickController(newController);
+            TimeTickController newController = new TimeTickController(0, 3, true, TimeTickIdentifier.Custom);
+            manager.AddNewCustomTickController(newController);
+            manager.RemoveCustomTickController(newController);
 
             Assert.False(manager.TimeTickControllers.Contains(newController),
                 "Custom controller couldn't be removed for no reason");
@@ -73,8 +73,8 @@ namespace Tests.TimeTickTests
             {
                 if (identifier == TimeTickIdentifier.Custom) continue;
 
-                TimeTickController newController = new TimeTickController(0, 3, identifier);
-                manager.AddNewTickController(newController);
+                TimeTickController newController = new TimeTickController(0, 3, true, identifier);
+                manager.AddNewCustomTickController(newController);
 
                 int identifierCountInList = manager.TimeTickControllers.Count(x => x.TimeIdentifier == identifier);
                 Assert.AreEqual(1, identifierCountInList, "There can only 1 controller for the same identifier");
@@ -90,7 +90,7 @@ namespace Tests.TimeTickTests
             {
                 if (controller.TimeIdentifier == TimeTickIdentifier.Custom) continue;
 
-                manager.RemoveTickController(controller);
+                manager.RemoveCustomTickController(controller);
 
                 Assert.Contains(controller, manager.TimeTickControllers,
                     "Non Custom identified controllers can't be removed");
@@ -102,10 +102,10 @@ namespace Tests.TimeTickTests
         {
             var manager = new TimeTickManager();
 
-            TimeTickController newController = new TimeTickController(0, 3, TimeTickIdentifier.Custom);
-            manager.AddNewTickController(newController);
-            manager.AddNewTickController(newController);
-            manager.AddNewTickController(newController);
+            TimeTickController newController = new TimeTickController(0, 3, true, TimeTickIdentifier.Custom);
+            manager.AddNewCustomTickController(newController);
+            manager.AddNewCustomTickController(newController);
+            manager.AddNewCustomTickController(newController);
 
             int newControllerCountInList = manager.TimeTickControllers.Count(x => x == newController);
             Assert.AreEqual(1, newControllerCountInList, "You can't add the same element");
