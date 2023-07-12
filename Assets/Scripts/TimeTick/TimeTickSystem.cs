@@ -51,18 +51,18 @@ namespace TimeTick
 
         public void AddNewTimeTick(TimeTickController timeTickController)
         {
-            TickManager.AddNewTickController(timeTickController);
+            TickManager.AddNewCustomTickController(timeTickController);
         }
 
         public void RemoveTimeTick(TimeTickController timeTickController)
         {
-            TickManager.RemoveTickController(timeTickController);
+            TickManager.RemoveCustomTickController(timeTickController);
         }
 
         public void SubscribeToPreDefinedTimeTick(TimeTickIdentifier timeIdentifier, Action timeTickHandler)
         {
             if (timeIdentifier == TimeTickIdentifier.Custom) return;
-            if (TickManager.GetTickController(timeIdentifier, out TimeTickController tickController))
+            if (TickManager.GetPreDefinedTickController(timeIdentifier, out TimeTickController tickController))
             {
                 tickController.OnTimeTick += timeTickHandler;
             }
@@ -71,7 +71,7 @@ namespace TimeTick
         public void UnSubscribeFromPreDefinedTimeTick(TimeTickIdentifier timeIdentifier, Action timeTickHandler)
         {
             if (timeIdentifier == TimeTickIdentifier.Custom) return;
-            if (TickManager.GetTickController(timeIdentifier, out TimeTickController tickController))
+            if (TickManager.GetPreDefinedTickController(timeIdentifier, out TimeTickController tickController))
             {
                 tickController.OnTimeTick -= timeTickHandler;
             }
