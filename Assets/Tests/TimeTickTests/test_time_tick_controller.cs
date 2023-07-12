@@ -232,5 +232,118 @@ namespace Tests.TimeTickTests
 
             Assert.That(callCount, Is.EqualTo(expectedResult));
         }
+
+        [Test]
+        public void Should_Non_Automated_Controllers_Not_Renew_Timer_After_Duration_Update()
+        {
+            foreach (var totalTime in _timesToAddToExceedTotalTimeOf1Second)
+            {
+                foreach (var newDuration in _totalTimesToTest)
+                {
+                    int callCount = 0;
+                    float startTime = totalTime / 2;
+                    var controller = new TimeTickController(startTime, totalTime, false);
+                    controller.OnTimeTick += () => callCount++;
+                    int expectedResult = 0;
+
+                    controller.UpdateTickDuration(newDuration);
+
+                    Assert.That(callCount, Is.EqualTo(expectedResult),
+                        $"newDuration: {newDuration}, total: {totalTime}, timer: {controller.TickTimer}");
+                }
+            }
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controllers_Not_Renew_Timer_After_Time_Update()
+        {
+            foreach (var totalTime in _totalTimesToTest)
+            {
+                foreach (var timeToIncrease in _timesToAddToExceedTotalTimeOf1Second)
+                {
+                    int callCount = 0;
+                    float startTime = totalTime / 2;
+                    var controller = new TimeTickController(startTime, totalTime, false);
+                    controller.OnTimeTick += () => callCount++;
+                    int expectedResult = 0;
+
+                    controller.UpdateTimer(timeToIncrease);
+
+                    Assert.That(callCount, Is.EqualTo(expectedResult),
+                        $"timer: {controller.TickTimer}, total: {totalTime}, invoked time: {callCount}");
+                }
+            }
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controller_Not_Renew_Timer_If_Time_Not_Exceeds_After_Time_Update()
+        {
+            var controller = new TimeTickController(0, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 0;
+
+            controller.UpdateTimer(0.2f);
+            controller.RenewTimer();
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controller_Not_Renew_Timer_If_Time_Not_Exceeds_After_Duration_Update()
+        {
+            var controller = new TimeTickController(0, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 0;
+
+            controller.UpdateTickDuration(0.5f);
+            controller.RenewTimer();
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controller_Renew_Timer_If_Time_Exceeds_After_Time_Update()
+        {
+            var controller = new TimeTickController(0, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 1;
+
+            controller.UpdateTimer(1.5f);
+            controller.RenewTimer();
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Non_Automated_Controller_Renew_Timer_If_Time_Exceeds_After_Duration_Update()
+        {
+            var controller = new TimeTickController(0.5f, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 1;
+
+            controller.UpdateTickDuration(0.2f);
+            controller.RenewTimer();
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void Should_Set_Automation_Renew_Timer_After_Next_Time_Update()
+        {
+            var controller = new TimeTickController(0.5f, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 1;
+
+            controller.UpdateTimer(1f);
+            controller.SetAutomation(true);
+            controller.UpdateTimer(0.1f);
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
     }
 }
