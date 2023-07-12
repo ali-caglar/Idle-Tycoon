@@ -14,6 +14,9 @@ namespace Generators
     {
         #region EVENTS
 
+        /// <summary>
+        /// This event invoked whether generator is unlocked or bought another.
+        /// </summary>
         public event Action OnGeneratorBought;
 
         #endregion
