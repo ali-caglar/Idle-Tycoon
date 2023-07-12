@@ -77,7 +77,7 @@ namespace Generators
         {
             if (UserData.IsUnlocked)
             {
-                _timeTickController = new TimeTickController(0, ProfitData.durationToEarnProfit);
+                _timeTickController = new TimeTickController(0, ProfitData.durationToEarnProfit, false);
                 _timeTickController.OnTimeTick += AddProductionToCurrencyController;
 
                 _timeSystem.AddNewTimeTick(_timeTickController);
