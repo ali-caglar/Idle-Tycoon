@@ -7,7 +7,7 @@ using UnityEngine.TestTools.Utils;
 
 namespace Tests.TimeTickTests
 {
-    public class test_time_tick_controller
+    public class TestTimeTickController
     {
         private float[] _expectedPercentages = { 0.1f, 0.25f, 0.5f, 0.6f, 0.99f };
 
