@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace Generators
 {
+    [RequireComponent(typeof(WorkerController))]
     public class GeneratorController : MonoBehaviour
     {
         #region EVENTS
@@ -35,6 +36,7 @@ namespace Generators
         private GeneratorManager _generatorManager;
         private TimeTickSystem _timeSystem;
         private CurrencySystem _currencySystem;
+        private WorkerController _workerController;
 
         #endregion
 
@@ -60,6 +62,9 @@ namespace Generators
         private GeneratorCostDataModel CostData => generatorData.DataModel.costDataModel;
         private GeneratorProfitDataModel ProfitData => generatorData.DataModel.profitDataModel;
 
+        // Getters from worker controller
+        private bool IsAutomated => _workerController.HasWorker;
+
         #endregion
 
         #region INITIALIZER
@@ -70,14 +75,23 @@ namespace Generators
             _generatorManager = generatorManager;
             _timeSystem = timeSystem;
             _currencySystem = currencySystem;
+            _workerController = GetComponent<WorkerController>();
+
+            InitSubControllers();
             InitController();
+        }
+
+        private void InitSubControllers()
+        {
+            WorkerData workerData = _generatorManager.GetWorkerData(generatorData.UserData.AssignedWorkerIdentifierID);
+            _workerController.Initialize(generatorData.DataModel.identifierID, workerData);
         }
 
         private void InitController()
         {
             if (UserData.IsUnlocked)
             {
-                _timeTickController = new TimeTickController(0, ProfitData.durationToEarnProfit, false);
+                _timeTickController = new TimeTickController(0, GetTickDuration(), IsAutomated);
                 _timeTickController.OnTimeTick += AddProductionToCurrencyController;
 
                 _timeSystem.AddNewTimeTick(_timeTickController);
@@ -116,6 +130,24 @@ namespace Generators
             }
         }
 
+        public void AssignWorker(string workerID)
+        {
+            WorkerData workerData = _generatorManager.GetWorkerData(workerID);
+            if (_workerController.AssignWorker(workerData))
+            {
+                UserData.AssignedWorkerIdentifierID = workerID;
+            }
+
+            UpdateTickAutomation();
+        }
+
+        public void RemoveWorker()
+        {
+            _workerController.RemoveWorker();
+            UserData.AssignedWorkerIdentifierID = string.Empty;
+            UpdateTickAutomation();
+        }
+
         #endregion
 
         #region PRIVATE METHODS
@@ -128,12 +160,13 @@ namespace Generators
 
         private BigDouble GetProductionPerTick()
         {
-            return (CurrentLevel * ProfitMultiplierFromBonus) * ProfitData.profitPerLevel;
+            var production = (CurrentLevel * ProfitMultiplierFromBonus) * ProfitData.profitPerLevel;
+            return production * _workerController.ProfitMultiplier;
         }
 
         private BigDouble GetProductionPerSecond()
         {
-            return GetProductionPerTick() / ProfitData.durationToEarnProfit;
+            return GetProductionPerTick() / GetTickDuration();
         }
 
         private BigDouble GetUnlockCost()
@@ -146,7 +179,21 @@ namespace Generators
             var buyOption = _generatorManager.BuyOption;
             var currentMoney = _currencySystem.GetCurrentAmount(CostType);
             var amountToBuy = Calculator.CalculateAmountToBuy(buyOption, CostData, CurrentLevel, currentMoney);
-            return Calculator.GetGeneratorCost(CostData, amountToBuy, CurrentLevel);
+            var price = Calculator.GetGeneratorCost(CostData, amountToBuy, CurrentLevel);
+            return price * _workerController.CostDiscount;
+        }
+
+        private float GetTickDuration()
+        {
+            return ProfitData.durationToEarnProfit * _workerController.TimeMultiplier;
+        }
+
+        private void UpdateTickAutomation()
+        {
+            if (_timeTickController is { TimeIdentifier: TimeTickIdentifier.Custom })
+            {
+                _timeTickController.SetAutomation(IsAutomated);
+            }
         }
 
         #endregion

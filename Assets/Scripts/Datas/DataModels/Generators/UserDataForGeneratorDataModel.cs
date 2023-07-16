@@ -7,8 +7,9 @@ namespace Datas.DataModels.Generators
         public string IdentifierID;
         public bool IsUnlocked;
         public ulong CurrentLevel;
+        public string AssignedWorkerIdentifierID;
 
-        public UserDataForGeneratorDataModel(string identifierID, bool isUnlocked, ulong currentLevel)
+        public UserDataForGeneratorDataModel(string identifierID, bool isUnlocked, ulong currentLevel, string assignedWorkerID)
         {
             if (string.IsNullOrEmpty(identifierID))
             {
@@ -23,6 +24,7 @@ namespace Datas.DataModels.Generators
             IdentifierID = identifierID;
             IsUnlocked = isUnlocked;
             CurrentLevel = currentLevel;
+            AssignedWorkerIdentifierID = assignedWorkerID;
         }
     }
 }
