@@ -345,5 +345,20 @@ namespace Tests.TimeTickTests
 
             Assert.That(callCount, Is.EqualTo(expectedResult));
         }
+
+        [Test]
+        public void Should_PreDefined_Controller_Always_Automated()
+        {
+            var controller = new TimeTickController(0.5f, 1, false);
+            int callCount = 0;
+            controller.OnTimeTick += () => callCount++;
+            int expectedResult = 1;
+
+            controller.UpdateTimer(1f);
+            controller.SetAutomation(true);
+            controller.UpdateTimer(0.1f);
+
+            Assert.That(callCount, Is.EqualTo(expectedResult));
+        }
     }
 }
