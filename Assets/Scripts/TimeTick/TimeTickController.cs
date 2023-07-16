@@ -32,6 +32,11 @@ namespace TimeTick
 
         #region CONSTRUCTOR
 
+        /// <param name="startTime">Timer's start value</param>
+        /// <param name="totalTime">Timer's duration</param>
+        /// <param name="isAutomated">Timer's renewing option if it's exceed total time</param>
+        /// <param name="timeIdentifier">Identifier of the controller</param>
+        /// <exception cref="Exception">Not handling negative values</exception>
         public TimeTickController(float startTime, float totalTime, bool isAutomated, TimeTickIdentifier timeIdentifier = TimeTickIdentifier.Custom)
         {
             if (startTime < 0)
@@ -42,6 +47,11 @@ namespace TimeTick
             if (totalTime <= 0)
             {
                 throw new Exception("Tick Duration can't be less than or equal to 0");
+            }
+
+            if (TimeIdentifier != TimeTickIdentifier.Custom)
+            {
+                isAutomated = true;
             }
 
             IsAutomated = isAutomated;
@@ -121,12 +131,13 @@ namespace TimeTick
         }
 
         /// <summary>
-        /// Updates automation. If set to automated controller handles renewing timer by itself. 
+        /// Updates automation. If set to automated controller handles renewing timer by itself.
+        /// Pre-defined controllers always automated and can't be changed. 
         /// </summary>
         /// <param name="isAutomated">Set automation by value</param>
         public void SetAutomation(bool isAutomated)
         {
-            IsAutomated = isAutomated;
+            IsAutomated = TimeIdentifier != TimeTickIdentifier.Custom || isAutomated;
         }
 
         /// <summary>

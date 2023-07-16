@@ -7,7 +7,7 @@ using UnityEngine.TestTools.Utils;
 
 namespace Tests.TimeTickTests
 {
-    public class test_time_tick_controller
+    public class TestTimeTickController
     {
         private float[] _expectedPercentages = { 0.1f, 0.25f, 0.5f, 0.6f, 0.99f };
 
@@ -333,21 +333,6 @@ namespace Tests.TimeTickTests
 
         [Test]
         public void Should_Set_Automation_Renew_Timer_After_Next_Time_Update()
-        {
-            var controller = new TimeTickController(0.5f, 1, false);
-            int callCount = 0;
-            controller.OnTimeTick += () => callCount++;
-            int expectedResult = 1;
-
-            controller.UpdateTimer(1f);
-            controller.SetAutomation(true);
-            controller.UpdateTimer(0.1f);
-
-            Assert.That(callCount, Is.EqualTo(expectedResult));
-        }
-
-        [Test]
-        public void Should_PreDefined_Controller_Always_Automated()
         {
             var controller = new TimeTickController(0.5f, 1, false);
             int callCount = 0;
