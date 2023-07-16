@@ -130,6 +130,12 @@ namespace Generators
             }
         }
 
+        public void CollectProductionOnTap()
+        {
+            if (IsAutomated || _timeTickController is { GetProgress: < 1 }) return;
+            AddProductionToCurrencyController();
+        }
+
         public void AssignWorker(string workerID)
         {
             WorkerData workerData = _generatorManager.GetWorkerData(workerID);
