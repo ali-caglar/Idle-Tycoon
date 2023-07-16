@@ -6,7 +6,7 @@ using TimeTick;
 
 namespace Tests.TimeTickTests
 {
-    public class test_time_tick_manager
+    public class TestTimeTickManager
     {
         [Test]
         public void Should_Have_All_Default_Controllers_Except_CustomIdentifier()
@@ -24,6 +24,21 @@ namespace Tests.TimeTickTests
                 {
                     Assert.True(manager.GetPreDefinedTickController(identifier, out TimeTickController tickController),
                         $"There's missing identifier: {identifier.ToString()}");
+                }
+            }
+        }
+
+        [Test]
+        public void Should_Default_Controllers_Initiated_As_Automated()
+        {
+            var manager = new TimeTickManager();
+
+            foreach (var tickController in manager.TimeTickControllers)
+            {
+                if (tickController.TimeIdentifier != TimeTickIdentifier.Custom)
+                {
+                    Assert.AreEqual(true, tickController.IsAutomated,
+                        "Default controllers has to be automated.");
                 }
             }
         }
@@ -125,6 +140,23 @@ namespace Tests.TimeTickTests
 
                 Assert.AreEqual(timeToIncrease, controller.TickTimer,
                     "All the timers should be updated");
+            }
+        }
+
+        [Test]
+        public void Should_PreDefined_Controllers_Always_Automated()
+        {
+            var manager = new TimeTickManager();
+
+            float timeToIncrease = 1.5f;
+            manager.UpdateTimers(timeToIncrease);
+
+            foreach (TimeTickController controller in manager.TimeTickControllers)
+            {
+                if (controller.TimeIdentifier == TimeTickIdentifier.Custom) continue;
+                controller.SetAutomation(false);
+
+                Assert.True(controller.IsAutomated, "Default controllers has to be automated.");
             }
         }
     }
