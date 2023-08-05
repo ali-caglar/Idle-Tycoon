@@ -1,17 +1,41 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Enums;
+using Installers;
 using NUnit.Framework;
 using TimeTick;
+using Zenject;
 
 namespace Tests.TimeTickTests
 {
-    public class TestTimeTickManager
+    [TestFixture]
+    public class TestTimeTickManager : ZenjectUnitTestFixture
     {
+        private const string SettingsInstallerPath = "Installers/SettingsInstaller";
+
+        private List<TimeTickControllerData> _tickControllerDatas;
+        private TimeTickControllerData _defaultControllerData;
+
+        [SetUp]
+        public void BindSettings()
+        {
+            Container.BindInterfacesAndSelfTo(typeof(TimeTickManager)).AsTransient();
+            SettingsInstaller.InstallFromResource(SettingsInstallerPath, Container);
+
+            _defaultControllerData = new TimeTickControllerData
+            {
+                isAutomated = true,
+                tickTimer = 0,
+                tickDuration = 3,
+                timeIdentifier = TimeTickIdentifier.Custom
+            };
+        }
+
         [Test]
         public void Should_Have_All_Default_Controllers_Except_CustomIdentifier()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
             foreach (TimeTickIdentifier identifier in Enum.GetValues(typeof(TimeTickIdentifier)))
             {
@@ -31,7 +55,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Default_Controllers_Initiated_As_Automated()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
             foreach (var tickController in manager.TimeTickControllers)
             {
@@ -46,7 +70,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Have_Correct_Amount_Controller()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
             int totalIdentifierCount = Enum.GetValues(typeof(TimeTickIdentifier)).Length;
             int expectedCount = totalIdentifierCount - 1; // extracting the custom identifier
 
@@ -57,9 +81,9 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Add_New_Unique_Controller()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
-            TimeTickController newController = new TimeTickController(0, 3, true, TimeTickIdentifier.Custom);
+            TimeTickController newController = new TimeTickController(_defaultControllerData);
             manager.AddNewCustomTickController(newController);
 
             Assert.Contains(newController, manager.TimeTickControllers,
@@ -69,9 +93,9 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Remove_Existed_Controller()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
-            TimeTickController newController = new TimeTickController(0, 3, true, TimeTickIdentifier.Custom);
+            TimeTickController newController = new TimeTickController(_defaultControllerData);
             manager.AddNewCustomTickController(newController);
             manager.RemoveCustomTickController(newController);
 
@@ -82,13 +106,15 @@ namespace Tests.TimeTickTests
         [Test]
         public void Can_Not_Add_NonCustomIdentifier_Controller()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
             foreach (TimeTickIdentifier identifier in Enum.GetValues(typeof(TimeTickIdentifier)))
             {
                 if (identifier == TimeTickIdentifier.Custom) continue;
 
-                TimeTickController newController = new TimeTickController(0, 3, true, identifier);
+                var controllerData = _defaultControllerData;
+                controllerData.timeIdentifier = identifier;
+                TimeTickController newController = new TimeTickController(controllerData);
                 manager.AddNewCustomTickController(newController);
 
                 int identifierCountInList = manager.TimeTickControllers.Count(x => x.TimeIdentifier == identifier);
@@ -99,7 +125,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Can_Not_Remove_NonCustomIdentifier_Controller()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
             foreach (TimeTickController controller in manager.TimeTickControllers)
             {
@@ -115,9 +141,9 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Not_Add_Same_Controller()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
-            TimeTickController newController = new TimeTickController(0, 3, true, TimeTickIdentifier.Custom);
+            TimeTickController newController = new TimeTickController(_defaultControllerData);
             manager.AddNewCustomTickController(newController);
             manager.AddNewCustomTickController(newController);
             manager.AddNewCustomTickController(newController);
@@ -129,11 +155,11 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_Update_All_Controllers_Timer()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
             float timeToIncrease = 0.01f;
             manager.UpdateTimers(timeToIncrease);
-            
+
             foreach (TimeTickController controller in manager.TimeTickControllers)
             {
                 if (controller.TimeIdentifier == TimeTickIdentifier.Custom) continue;
@@ -146,7 +172,7 @@ namespace Tests.TimeTickTests
         [Test]
         public void Should_PreDefined_Controllers_Always_Automated()
         {
-            var manager = new TimeTickManager();
+            var manager = Container.Resolve<TimeTickManager>();
 
             float timeToIncrease = 1.5f;
             manager.UpdateTimers(timeToIncrease);
