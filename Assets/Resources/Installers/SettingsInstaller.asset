@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultTimeTickControllersData: {fileID: 11400000, guid: 857e77a0dbc874a8dac2962d96351a3f,
     type: 2}
+  defaultCurrenciesData: {fileID: 11400000, guid: 5741443a190df4d34a289b9143516a6d,
+    type: 2}

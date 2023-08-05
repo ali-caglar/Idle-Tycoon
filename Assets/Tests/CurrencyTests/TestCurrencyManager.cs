@@ -1,30 +1,51 @@
+using System.Collections.Generic;
+using System.Linq;
 using BreakInfinity;
 using Currency;
 using Enums;
-using Helpers;
+using Installers;
 using NUnit.Framework;
+using Zenject;
 
 namespace Tests.CurrencyTests
 {
-    public class test_currency_manager
+    [TestFixture]
+    public class TestCurrencyManager : ZenjectUnitTestFixture
     {
+        private const string SettingsInstallerPath = "Installers/SettingsInstaller";
+        [Inject] private List<CurrencyData> _currencyDatas;
+
+        [SetUp]
+        public void BindSettings()
+        {
+            Container.Bind(typeof(CurrencyManager)).AsTransient();
+            SignalBusInstaller.Install(Container);
+            SettingsInstaller.InstallFromResource(SettingsInstallerPath, Container);
+
+            Container.DeclareSignal<CurrencyChangedSignal>();
+            Container.Inject(this);
+        }
+
         [Test]
         public void Should_Controllers_Initiated_With_Correct_Amount()
         {
-            var manager = new CurrencyManager();
+            var manager = Container.Resolve<CurrencyManager>();
 
-            Assert.AreEqual(Constants.MoneyStartValue, manager.GetCurrentAmount(CurrencyType.Money).ToDouble());
-            Assert.AreEqual(Constants.GemStartValue, manager.GetCurrentAmount(CurrencyType.Gem).ToDouble());
+            var moneyStartValue = _currencyDatas.FirstOrDefault(x => x.currencyType == CurrencyType.Money).currentAmount;
+            var gemStartValue = _currencyDatas.FirstOrDefault(x => x.currencyType == CurrencyType.Gem).currentAmount;
+
+            Assert.AreEqual(moneyStartValue, manager.GetCurrentAmount(CurrencyType.Money));
+            Assert.AreEqual(gemStartValue, manager.GetCurrentAmount(CurrencyType.Gem));
         }
 
         [Test]
         public void Should_Controllers_Add_Correct_Amount()
         {
-            var manager = new CurrencyManager();
+            var manager = Container.Resolve<CurrencyManager>();
             BigDouble moneyToAdd = new BigDouble(3, 4);
             BigDouble gemToAdd = new BigDouble(3, 0);
-            BigDouble expectedMoney = moneyToAdd + Constants.MoneyStartValue;
-            BigDouble expectedGem = gemToAdd + Constants.GemStartValue;
+            BigDouble expectedMoney = moneyToAdd + manager.GetCurrentAmount(CurrencyType.Money);
+            BigDouble expectedGem = gemToAdd + manager.GetCurrentAmount(CurrencyType.Gem);
 
             manager.AddAmount(CurrencyType.Money, moneyToAdd);
             manager.AddAmount(CurrencyType.Gem, gemToAdd);
@@ -36,13 +57,13 @@ namespace Tests.CurrencyTests
         [Test]
         public void Should_Controllers_Subtract_Correct_Amount()
         {
-            var manager = new CurrencyManager();
+            var manager = Container.Resolve<CurrencyManager>();
             BigDouble moneyToAdd = new BigDouble(3, 4);
             BigDouble gemToAdd = new BigDouble(3, 0);
             BigDouble moneyToSubtract = new BigDouble(2, 1);
             BigDouble gemToSubtract = new BigDouble(1, 0);
-            BigDouble expectedMoney = moneyToAdd + Constants.MoneyStartValue - moneyToSubtract;
-            BigDouble expectedGem = gemToAdd + Constants.GemStartValue - gemToSubtract;
+            BigDouble expectedMoney = moneyToAdd + manager.GetCurrentAmount(CurrencyType.Money) - moneyToSubtract;
+            BigDouble expectedGem = gemToAdd + manager.GetCurrentAmount(CurrencyType.Gem) - gemToSubtract;
 
             manager.AddAmount(CurrencyType.Money, moneyToAdd);
             manager.AddAmount(CurrencyType.Gem, gemToAdd);
@@ -56,15 +77,17 @@ namespace Tests.CurrencyTests
         [Test]
         public void Should_Controllers_Has_Enough_Amount()
         {
-            var manager = new CurrencyManager();
+            var manager = Container.Resolve<CurrencyManager>();
+            BigDouble startMoney = manager.GetCurrentAmount(CurrencyType.Money);
+            BigDouble startGem = manager.GetCurrentAmount(CurrencyType.Gem);
             BigDouble moneyToAdd = new BigDouble(3, 4);
             BigDouble gemToAdd = new BigDouble(3, 0);
 
             manager.AddAmount(CurrencyType.Money, moneyToAdd);
             manager.AddAmount(CurrencyType.Gem, gemToAdd);
 
-            bool isEqualMoneyCountAsEnough = manager.HasEnoughAmount(CurrencyType.Money, moneyToAdd);
-            bool isEqualGemCountAsEnough = manager.HasEnoughAmount(CurrencyType.Gem, gemToAdd);
+            bool isEqualMoneyCountAsEnough = manager.HasEnoughAmount(CurrencyType.Money, moneyToAdd + startMoney);
+            bool isEqualGemCountAsEnough = manager.HasEnoughAmount(CurrencyType.Gem, gemToAdd + startGem);
             bool isMoneyCountAsEnough = manager.HasEnoughAmount(CurrencyType.Money, moneyToAdd / 2);
             bool isGemCountAsEnough = manager.HasEnoughAmount(CurrencyType.Gem, gemToAdd / 2);
 
@@ -72,83 +95,6 @@ namespace Tests.CurrencyTests
             Assert.IsTrue(isEqualGemCountAsEnough, "Equal values should act as enough.");
             Assert.IsTrue(isMoneyCountAsEnough, "Values less than current money should be enough.");
             Assert.IsTrue(isGemCountAsEnough, "Values less than current money should be enough.");
-        }
-
-        [Test]
-        public void Should_Subscribe_To_Controller()
-        {
-            var manager = new CurrencyManager();
-            int callCount = 0;
-            BigDouble moneyToAdd = new BigDouble(3, 4);
-
-            manager.SubscribeToCurrencyChanges(CurrencyType.Money, _ => callCount++);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-
-            Assert.AreEqual(1, callCount);
-        }
-
-        [Test]
-        public void Should_Subscribe_To_Selected_Controller()
-        {
-            var manager = new CurrencyManager();
-            int callCount = 0;
-            BigDouble moneyToAdd = new BigDouble(3, 4);
-            BigDouble gemToAdd = new BigDouble(3, 0);
-
-            manager.SubscribeToCurrencyChanges(CurrencyType.Gem, _ => callCount++);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-            manager.AddAmount(CurrencyType.Gem, gemToAdd);
-
-            Assert.AreEqual(1, callCount);
-        }
-
-        [Test]
-        public void Should_UnSubscribe_From_Controller()
-        {
-            var manager = new CurrencyManager();
-            int callCount = 0;
-            BigDouble moneyToAdd = new BigDouble(3, 4);
-
-            void SubscribeAction(BigDouble temp)
-            {
-                callCount++;
-            }
-
-            manager.SubscribeToCurrencyChanges(CurrencyType.Money, SubscribeAction);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-            manager.UnSubscribeFromCurrencyChanges(CurrencyType.Money, SubscribeAction);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-
-            Assert.AreEqual(1, callCount);
-        }
-
-        [Test]
-        public void Should_UnSubscribe_From_All()
-        {
-            var manager = new CurrencyManager();
-            int callCount = 0;
-            BigDouble moneyToAdd = new BigDouble(3, 4);
-
-            void SubscribeAction(BigDouble temp)
-            {
-                callCount++;
-            }
-
-            manager.SubscribeToCurrencyChanges(CurrencyType.Money, SubscribeAction);
-            manager.SubscribeToCurrencyChanges(CurrencyType.Gem, SubscribeAction);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-            manager.AddAmount(CurrencyType.Gem, moneyToAdd);
-            manager.RemoveAllListeners();
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-            manager.AddAmount(CurrencyType.Money, moneyToAdd);
-            manager.AddAmount(CurrencyType.Gem, moneyToAdd);
-            manager.AddAmount(CurrencyType.Gem, moneyToAdd);
-            manager.AddAmount(CurrencyType.Gem, moneyToAdd);
-
-            Assert.AreEqual(2, callCount);
         }
     }
 }

@@ -1,3 +1,4 @@
+using Currency;
 using TimeTick;
 using UnityEngine;
 using Zenject;
@@ -8,10 +9,12 @@ namespace Installers
     public class SettingsInstaller : ScriptableObjectInstaller<SettingsInstaller>
     {
         [SerializeField] private DefaultTimeTickControllersData defaultTimeTickControllersData;
+        [SerializeField] private DefaultCurrenciesData defaultCurrenciesData;
 
         public override void InstallBindings()
         {
             Container.BindInstance(defaultTimeTickControllersData.DefaultControllers);
+            Container.BindInstance(defaultCurrenciesData.DefaultCurrencies);
         }
     }
 }

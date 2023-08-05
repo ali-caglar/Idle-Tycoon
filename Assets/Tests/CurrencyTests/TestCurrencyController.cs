@@ -1,16 +1,22 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using BreakInfinity;
 using Currency;
 using Enums;
-using Helpers;
-using NSubstitute;
+using Installers;
 using NUnit.Framework;
-using UnityEngine.UIElements;
+using Zenject;
 
 namespace Tests.CurrencyTests
 {
-    public class test_currency_controller
+    [TestFixture]
+    public class TestCurrencyController : ZenjectUnitTestFixture
     {
+        private const string SettingsInstallerPath = "Installers/SettingsInstaller";
+        [Inject] private SignalBus _signalBus;
+        [Inject] private List<CurrencyData> _currencyDatas;
+
         private BigDouble[] _moneyAmountsToAdd =
         {
             new(1, 1), new(8, 2), new(3, 4),
@@ -22,26 +28,56 @@ namespace Tests.CurrencyTests
             new(7, 1), new(3, 9), new(5, 5),
         };
 
+        [SetUp]
+        public void BindSettings()
+        {
+            SignalBusInstaller.Install(Container);
+            SettingsInstaller.InstallFromResource(SettingsInstallerPath, Container);
+
+            Container.DeclareSignal<CurrencyChangedSignal>();
+            Container.Inject(this);
+        }
+
+        private CurrencyController CreateNewCurrencyController(CurrencyType currencyType, bool isMoneyOverride = false,
+            BigDouble overrideMoney = default)
+        {
+            var data = _currencyDatas.FirstOrDefault(x => x.currencyType == currencyType);
+            if (isMoneyOverride)
+            {
+                data.currentAmount = overrideMoney;
+            }
+
+            var controller = new CurrencyController(_signalBus, data);
+
+            return controller;
+        }
+
+        private BigDouble GetStartValue(CurrencyType currencyType)
+        {
+            var data = _currencyDatas.FirstOrDefault(x => x.currencyType == currencyType);
+            return data.currentAmount;
+        }
+
         [Test]
         public void Should_Controller_Initialized()
         {
             CurrencyType currencyType = CurrencyType.Money;
-            BigDouble moneyAmount = Constants.MoneyStartValue;
+            BigDouble moneyAmount = GetStartValue(currencyType);
 
-            var controller = new CurrencyController(currencyType, moneyAmount);
+            var controller = CreateNewCurrencyController(currencyType);
 
             Assert.AreEqual(currencyType, controller.CurrencyType);
-            Assert.AreEqual(moneyAmount.ToDouble(), Constants.MoneyStartValue);
+            Assert.AreEqual(moneyAmount.ToDouble(), GetStartValue(currencyType).ToDouble());
         }
 
         [Test]
         public void Should_Controller_Add_Money()
         {
             CurrencyType currencyType = CurrencyType.Money;
-            BigDouble moneyAmount = Constants.MoneyStartValue;
+            BigDouble moneyAmount = GetStartValue(currencyType);
             BigDouble expectedResult = moneyAmount;
 
-            var controller = new CurrencyController(currencyType, moneyAmount);
+            var controller = CreateNewCurrencyController(currencyType);
 
             foreach (var amountToAdd in _moneyAmountsToAdd)
             {
@@ -57,7 +93,7 @@ namespace Tests.CurrencyTests
             CurrencyType currencyType = CurrencyType.Money;
             BigDouble expectedResult = 0;
 
-            var controller = new CurrencyController(currencyType, 0);
+            var controller = CreateNewCurrencyController(currencyType, true, 0);
 
             foreach (var amountToAdd in _moneyAmountsToAdd)
             {
@@ -80,7 +116,7 @@ namespace Tests.CurrencyTests
         {
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 0);
+            var controller = CreateNewCurrencyController(currencyType, true, 0);
 
             foreach (var value in _moneyAmountsToAdd)
             {
@@ -105,7 +141,7 @@ namespace Tests.CurrencyTests
         {
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, _moneyAmountsToAdd.Max());
+            var controller = CreateNewCurrencyController(currencyType, true, _moneyAmountsToAdd.Max());
 
             foreach (var value in _moneyAmountsToAdd)
             {
@@ -120,7 +156,7 @@ namespace Tests.CurrencyTests
             BigDouble startValue = _moneyAmountsToAdd.Max();
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, startValue);
+            var controller = CreateNewCurrencyController(currencyType, true, startValue);
 
             foreach (var value in _moneyAmountsToAdd)
             {
@@ -140,7 +176,7 @@ namespace Tests.CurrencyTests
         {
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 0);
+            var controller = CreateNewCurrencyController(currencyType, true, 0);
 
             foreach (var value in _moneyAmountsToAdd)
             {
@@ -155,10 +191,14 @@ namespace Tests.CurrencyTests
             int callCount = 0;
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 0);
-            controller.OnAmountChanged += _ => callCount++;
+            var controller = CreateNewCurrencyController(currencyType);
+
+            Action eventCallback = () => callCount++;
+            _signalBus.Subscribe<CurrencyChangedSignal>(eventCallback);
+
             controller.AddAmount(50);
 
+            _signalBus.Unsubscribe<CurrencyChangedSignal>(eventCallback);
             Assert.AreEqual(1, callCount);
         }
 
@@ -168,9 +208,14 @@ namespace Tests.CurrencyTests
             int callCount = 0;
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 50);
-            controller.OnAmountChanged += _ => callCount++;
+            var controller = CreateNewCurrencyController(currencyType, true, 50);
+
+            Action eventCallback = () => callCount++;
+            _signalBus.Subscribe<CurrencyChangedSignal>(eventCallback);
+
             controller.SubtractAmount(50);
+
+            _signalBus.Unsubscribe<CurrencyChangedSignal>(eventCallback);
 
             Assert.AreEqual(1, callCount);
         }
@@ -182,14 +227,17 @@ namespace Tests.CurrencyTests
             int expectedCount = _moneyAmountsToAdd.Length * 2;
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 50);
-            controller.OnAmountChanged += _ => callCount++;
+            var controller = CreateNewCurrencyController(currencyType, true, 50);
+            Action eventCallback = () => callCount++;
+            _signalBus.Subscribe<CurrencyChangedSignal>(eventCallback);
 
             foreach (var value in _moneyAmountsToAdd)
             {
                 controller.AddAmount(value);
                 controller.SubtractAmount(value);
             }
+
+            _signalBus.Unsubscribe<CurrencyChangedSignal>(eventCallback);
 
             Assert.AreEqual(expectedCount, callCount);
         }
@@ -200,11 +248,14 @@ namespace Tests.CurrencyTests
             int callCount = 0;
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 0);
-            controller.OnAmountChanged += _ => callCount++;
+            var controller = CreateNewCurrencyController(currencyType, true, 0);
+            Action eventCallback = () => callCount++;
+            _signalBus.Subscribe<CurrencyChangedSignal>(eventCallback);
             controller.SubtractAmount(50);
             controller.SubtractAmount(-50);
             controller.AddAmount(-50);
+
+            _signalBus.Unsubscribe<CurrencyChangedSignal>(eventCallback);
 
             Assert.AreEqual(0, callCount);
         }
@@ -216,8 +267,15 @@ namespace Tests.CurrencyTests
             BigDouble addedMoney = 0;
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 0);
-            controller.OnAmountChanged += value => moneyFromAction = value;
+            var controller = CreateNewCurrencyController(currencyType, true, 0);
+
+            Action<CurrencyChangedSignal> eventCallback = currencyData =>
+            {
+                moneyFromAction = currencyData.CurrencyData.currentAmount;
+            };
+
+            _signalBus.Subscribe(eventCallback);
+            // controller.OnAmountChanged += value => moneyFromAction = value;
 
             foreach (var moneyToAdd in _moneyAmountsToAdd)
             {
@@ -225,6 +283,8 @@ namespace Tests.CurrencyTests
                 controller.AddAmount(moneyToAdd);
                 Assert.AreEqual(addedMoney, moneyFromAction);
             }
+
+            _signalBus.Unsubscribe(eventCallback);
         }
 
         [Test]
@@ -234,7 +294,7 @@ namespace Tests.CurrencyTests
             BigDouble subtractedMoney = 0;
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 0);
+            var controller = CreateNewCurrencyController(currencyType, true, 0);
 
             foreach (var amountToAdd in _moneyAmountsToAdd)
             {
@@ -242,7 +302,13 @@ namespace Tests.CurrencyTests
                 controller.AddAmount(amountToAdd);
             }
 
-            controller.OnAmountChanged += value => moneyFromAction = value;
+            Action<CurrencyChangedSignal> eventCallback = currencyData =>
+            {
+                moneyFromAction = currencyData.CurrencyData.currentAmount;
+            };
+
+            _signalBus.Subscribe(eventCallback);
+            // controller.OnAmountChanged += value => moneyFromAction = value;
 
             foreach (var moneyToSubtract in _moneyAmountsToAdd)
             {
@@ -250,6 +316,8 @@ namespace Tests.CurrencyTests
                 controller.SubtractAmount(moneyToSubtract);
                 Assert.AreEqual(subtractedMoney, moneyFromAction);
             }
+
+            _signalBus.Unsubscribe(eventCallback);
         }
 
         [Test]
@@ -260,12 +328,17 @@ namespace Tests.CurrencyTests
             int expectedCallCount = 1;
             CurrencyType currencyType = CurrencyType.Money;
 
-            var controller = new CurrencyController(currencyType, 0);
-            controller.OnAmountChanged += _ => callCountToIncrease++;
-            controller.OnAmountChanged += _ => callCountToDecrease--;
+            var controller = CreateNewCurrencyController(currencyType, true, 0);
+
+            Action eventCallbackIncrease = () => callCountToIncrease++;
+            Action eventCallbackDecrease = () => callCountToDecrease--;
+            _signalBus.Subscribe<CurrencyChangedSignal>(eventCallbackIncrease);
+            _signalBus.Subscribe<CurrencyChangedSignal>(eventCallbackDecrease);
 
             controller.AddAmount(1);
-            controller.RemoveAllListeners();
+
+            _signalBus.Unsubscribe<CurrencyChangedSignal>(eventCallbackIncrease);
+            _signalBus.Unsubscribe<CurrencyChangedSignal>(eventCallbackDecrease);
 
             Assert.AreEqual(expectedCallCount, callCountToIncrease);
             Assert.AreEqual(expectedCallCount, callCountToDecrease);

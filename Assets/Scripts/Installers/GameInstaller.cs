@@ -1,3 +1,4 @@
+using Currency;
 using TimeTick;
 using Zenject;
 
@@ -7,6 +8,7 @@ namespace Installers
     {
         public override void InstallBindings()
         {
+            Container.Bind(typeof(CurrencyManager)).AsSingle();
             Container.BindInterfacesAndSelfTo(typeof(TimeTickManager)).AsSingle();
         }
     }
