@@ -71,6 +71,16 @@ namespace Tests.CurrencyTests
         }
 
         [Test]
+        public void Should_Controller_Initialized_Above_0()
+        {
+            CurrencyType currencyType = CurrencyType.Money;
+
+            var controller = CreateNewCurrencyController(currencyType, true, -1);
+
+            Assert.AreEqual(0d, controller.CurrentAmount.ToDouble());
+        }
+
+        [Test]
         public void Should_Controller_Add_Money()
         {
             CurrencyType currencyType = CurrencyType.Money;
