@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 951e893e39d74b5caef2f285cb1e597c, type: 3}
+  m_Name: Default Time Tick Data
+  m_EditorClassIdentifier: 
+  defaultControllers:
+  - isAutomated: 1
+    tickTimer: 0
+    tickDuration: 1
+    timeIdentifier: 1
+  - isAutomated: 1
+    tickTimer: 0
+    tickDuration: 2
+    timeIdentifier: 2
+  - isAutomated: 1
+    tickTimer: 0
+    tickDuration: 3
+    timeIdentifier: 3
+  - isAutomated: 1
+    tickTimer: 0
+    tickDuration: 5
+    timeIdentifier: 4
+  - isAutomated: 1
+    tickTimer: 0
+    tickDuration: 10
+    timeIdentifier: 5

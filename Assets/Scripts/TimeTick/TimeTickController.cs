@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace TimeTick
 {
+    [Serializable]
     public class TimeTickController
     {
         #region EVENTS
@@ -13,6 +14,12 @@ namespace TimeTick
         /// Invoked when timer got reset after it exceeds the duration.
         /// </summary>
         public event Action OnTimeTick;
+
+        #endregion
+
+        #region PRIVATE FIELDS
+
+        private TimeTickControllerData _tickControllerData;
 
         #endregion
 
@@ -32,34 +39,32 @@ namespace TimeTick
 
         #region CONSTRUCTOR
 
-        /// <param name="startTime">Timer's start value</param>
-        /// <param name="totalTime">Timer's duration</param>
-        /// <param name="isAutomated">Timer's renewing option if it's exceed total time</param>
-        /// <param name="timeIdentifier">Identifier of the controller</param>
         /// <exception cref="Exception">Not handling negative values</exception>
-        public TimeTickController(float startTime, float totalTime, bool isAutomated, TimeTickIdentifier timeIdentifier = TimeTickIdentifier.Custom)
+        public TimeTickController(TimeTickControllerData timeData)
         {
-            if (startTime < 0)
+            _tickControllerData = timeData;
+
+            if (_tickControllerData.tickTimer < 0)
             {
-                startTime = 0;
+                _tickControllerData.tickTimer = 0;
             }
 
-            if (totalTime <= 0)
+            if (timeData.tickDuration <= 0)
             {
                 throw new Exception("Tick Duration can't be less than or equal to 0");
             }
 
-            if (TimeIdentifier != TimeTickIdentifier.Custom)
+            if (_tickControllerData.timeIdentifier != TimeTickIdentifier.Custom)
             {
-                isAutomated = true;
+                _tickControllerData.isAutomated = true;
             }
 
-            IsAutomated = isAutomated;
-            TickTimer = startTime % totalTime;
-            TickDuration = totalTime;
-            TimeIdentifier = timeIdentifier;
+            IsAutomated = _tickControllerData.isAutomated;
+            TickTimer = _tickControllerData.tickTimer % _tickControllerData.tickDuration;
+            TickDuration = _tickControllerData.tickDuration;
+            TimeIdentifier = _tickControllerData.timeIdentifier;
 
-            if (startTime >= totalTime)
+            if (timeData.tickTimer >= timeData.tickDuration)
             {
                 Debug.LogWarning("Start time was greater or equal to total duration, " +
                                  "start time updated upon total timer and there was no event invocation.");

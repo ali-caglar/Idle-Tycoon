@@ -1,27 +1,31 @@
-using System;
 using BreakInfinity;
 using Enums;
+using Extensions;
 using UnityEngine;
+using Zenject;
 
 namespace Currency
 {
     public class CurrencyController
     {
-        public event Action<BigDouble> OnAmountChanged;
+        private CurrencyData _currencyData;
+        private readonly SignalBus _signalBus;
 
-        public CurrencyType CurrencyType { get; private set; }
-        public BigDouble CurrentAmount { get; private set; }
+        private CurrencyChangedSignal _currencyChangedSignal;
 
-        public CurrencyController(CurrencyType currencyType, BigDouble currentAmount)
+        public CurrencyType CurrencyType => _currencyData.currencyType;
+        public BigDouble CurrentAmount => _currencyData.currentAmount;
+
+        public CurrencyController(SignalBus signalBus, CurrencyData currencyData)
         {
-            if (currentAmount < 0)
+            if (currencyData.currentAmount < 0)
             {
-                currentAmount = 0;
+                currencyData.currentAmount = 0;
                 Debug.LogWarning("Tried to initiate money with negative value.");
             }
 
-            CurrencyType = currencyType;
-            CurrentAmount = currentAmount;
+            _signalBus = signalBus;
+            _currencyData = currencyData;
         }
 
         public void AddAmount(BigDouble amountToAdd)
@@ -32,7 +36,7 @@ namespace Currency
                 return;
             }
 
-            CurrentAmount += amountToAdd;
+            UpdateCurrencyAmount(amountToAdd);
             InvokeAmountChange();
         }
 
@@ -46,24 +50,14 @@ namespace Currency
 
             if (HasEnoughAmount(amountToSubtract))
             {
-                CurrentAmount -= amountToSubtract;
+                UpdateCurrencyAmount(-amountToSubtract);
                 InvokeAmountChange();
             }
         }
 
         public bool HasEnoughAmount(BigDouble amountToCheck)
         {
-            return CurrentAmount >= amountToCheck;
-        }
-
-        public void RemoveAllListeners()
-        {
-            if (OnAmountChanged == null) return;
-            var listeners = OnAmountChanged.GetInvocationList();
-            foreach (var listener in listeners)
-            {
-                OnAmountChanged -= listener as Action<BigDouble>;
-            }
+            return _currencyData.currentAmount >= amountToCheck;
         }
 
         private bool CheckForNegativeValue(BigDouble value)
@@ -71,9 +65,19 @@ namespace Currency
             return value < 0;
         }
 
+        private void UpdateCurrencyAmount(BigDouble amountToAdd)
+        {
+            var currencyData = _currencyData;
+            currencyData.currentAmount += amountToAdd;
+            _currencyData = currencyData;
+        }
+
         private void InvokeAmountChange()
         {
-            OnAmountChanged?.Invoke(CurrentAmount);
+            _currencyChangedSignal ??= new CurrencyChangedSignal();
+            _currencyChangedSignal.CurrencyData = this._currencyData;
+
+            _signalBus.Fire(_currencyChangedSignal);
         }
     }
 }

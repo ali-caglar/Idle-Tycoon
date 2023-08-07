@@ -3,10 +3,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Enums;
 using UnityEngine;
+using Zenject;
 
 namespace TimeTick
 {
-    public class TimeTickManager
+    public class TimeTickManager : ITickable
     {
         #region PRIVATE FIELDS
 
@@ -22,16 +23,18 @@ namespace TimeTick
 
         #region CONSTRUCTOR
 
-        public TimeTickManager()
+        public TimeTickManager(List<TimeTickControllerData> defaultControllers)
         {
-            _timeTickControllers = new List<TimeTickController>
+            _timeTickControllers = new List<TimeTickController>();
+            foreach (var controllerData in defaultControllers)
             {
-                new(0, 1, true, TimeTickIdentifier.Second1),
-                new(0, 2, true, TimeTickIdentifier.Second2),
-                new(0, 3, true, TimeTickIdentifier.Second3),
-                new(0, 5, true, TimeTickIdentifier.Second5),
-                new(0, 10, true, TimeTickIdentifier.Second10),
-            };
+                _timeTickControllers.Add(new TimeTickController(controllerData));
+            }
+        }
+
+        public void Tick()
+        {
+            UpdateTimers(Time.deltaTime);
         }
 
         #endregion
