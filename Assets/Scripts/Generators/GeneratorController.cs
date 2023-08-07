@@ -7,6 +7,7 @@ using Enums;
 using Helpers;
 using TimeTick;
 using UnityEngine;
+using Zenject;
 
 namespace Generators
 {
@@ -34,8 +35,8 @@ namespace Generators
 
         // Dependencies
         private GeneratorManager _generatorManager;
-        private TimeTickSystem _timeSystem;
-        private CurrencySystem _currencySystem;
+        private TimeTickManager _timeManager;
+        private CurrencyManager _currencyManager;
         private WorkerController _workerController;
 
         #endregion
@@ -67,14 +68,15 @@ namespace Generators
 
         #endregion
 
-        #region INITIALIZER
+        #region CONSTRUCTOR
 
-        public void Initialize(GeneratorManager generatorManager, TimeTickSystem timeSystem,
-            CurrencySystem currencySystem)
+        [Inject]
+        private void Construct(GeneratorManager generatorManager, WorkerManager workerManager, TimeTickManager timeSystem, CurrencyManager currencySystem)
         {
             _generatorManager = generatorManager;
-            _timeSystem = timeSystem;
-            _currencySystem = currencySystem;
+            _workerManager = workerManager;
+            _timeManager = timeSystem;
+            _currencyManager = currencySystem;
             _workerController = GetComponent<WorkerController>();
 
             InitSubControllers();
@@ -89,13 +91,19 @@ namespace Generators
 
         private void InitController()
         {
-            if (UserData.IsUnlocked)
+            if (!UserData.IsUnlocked) return;
+            TimeTickControllerData timeData = new TimeTickControllerData
             {
-                _timeTickController = new TimeTickController(0, GetTickDuration(), IsAutomated);
-                _timeTickController.OnTimeTick += AddProductionToCurrencyController;
+                isAutomated = IsAutomated,
+                tickTimer = 0,
+                tickDuration = GetTickDuration(),
+                timeIdentifier = TimeTickIdentifier.Custom
+            };
 
-                _timeSystem.AddNewTimeTick(_timeTickController);
-            }
+            _timeTickController = new TimeTickController(timeData);
+            _timeTickController.OnTimeTick += AddProductionToCurrencyController;
+
+            _timeManager.AddNewCustomTickController(_timeTickController);
         }
 
         #endregion
@@ -107,11 +115,11 @@ namespace Generators
             if (UserData.IsUnlocked) return;
 
             var unlockCost = GetUnlockCost();
-            if (_currencySystem.HasEnoughAmount(CostType, unlockCost))
+            if (_currencyManager.HasEnoughAmount(CostType, unlockCost))
             {
                 UserData.IsUnlocked = true;
                 generatorData.Save();
-                _currencySystem.SubtractAmount(CostType, unlockCost);
+                _currencyManager.SubtractAmount(CostType, unlockCost);
                 OnGeneratorBought?.Invoke();
             }
         }
@@ -121,11 +129,11 @@ namespace Generators
             if (!UserData.IsUnlocked) return;
 
             var unlockCost = GetNextCost();
-            if (_currencySystem.HasEnoughAmount(CostType, unlockCost))
+            if (_currencyManager.HasEnoughAmount(CostType, unlockCost))
             {
                 UserData.CurrentLevel++;
                 generatorData.Save();
-                _currencySystem.SubtractAmount(CostType, unlockCost);
+                _currencyManager.SubtractAmount(CostType, unlockCost);
                 OnGeneratorBought?.Invoke();
             }
         }
@@ -161,7 +169,7 @@ namespace Generators
         private void AddProductionToCurrencyController()
         {
             var amountToAdd = GetProductionPerTick();
-            _currencySystem.AddAmount(ProductionType, amountToAdd);
+            _currencyManager.AddAmount(ProductionType, amountToAdd);
         }
 
         private BigDouble GetProductionPerTick()
@@ -183,7 +191,7 @@ namespace Generators
         private BigDouble GetNextCost()
         {
             var buyOption = _generatorManager.BuyOption;
-            var currentMoney = _currencySystem.GetCurrentAmount(CostType);
+            var currentMoney = _currencyManager.GetCurrentAmount(CostType);
             var amountToBuy = Calculator.CalculateAmountToBuy(buyOption, CostData, CurrentLevel, currentMoney);
             var price = Calculator.GetGeneratorCost(CostData, amountToBuy, CurrentLevel);
             return price * _workerController.CostDiscount;
