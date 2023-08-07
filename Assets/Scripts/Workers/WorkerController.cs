@@ -37,7 +37,7 @@ namespace Workers
 
         #region INITIALIZER
 
-        public void Initialize(string generatorID, WorkerData workerData)
+        public void Initialize(string generatorID)
         {
             if (string.IsNullOrEmpty(generatorID))
             {
@@ -45,7 +45,6 @@ namespace Workers
             }
 
             _generatorID = generatorID;
-            AssignWorker(workerData);
         }
 
         #endregion

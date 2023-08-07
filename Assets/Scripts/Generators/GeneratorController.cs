@@ -7,6 +7,7 @@ using Enums;
 using Helpers;
 using TimeTick;
 using UnityEngine;
+using Workers;
 using Zenject;
 
 namespace Generators
@@ -35,6 +36,7 @@ namespace Generators
 
         // Dependencies
         private GeneratorManager _generatorManager;
+        private WorkerManager _workerManager;
         private TimeTickManager _timeManager;
         private CurrencyManager _currencyManager;
         private WorkerController _workerController;
@@ -85,8 +87,14 @@ namespace Generators
 
         private void InitSubControllers()
         {
-            WorkerData workerData = _generatorManager.GetWorkerData(generatorData.UserData.AssignedWorkerIdentifierID);
-            _workerController.Initialize(generatorData.DataModel.identifierID, workerData);
+            _workerController.Initialize(generatorData.DataModel.identifierID);
+
+            string workerIdentifierID = generatorData.UserData.AssignedWorkerIdentifierID;
+            if (!string.IsNullOrEmpty(workerIdentifierID))
+            {
+                WorkerData workerData = _workerManager.GetWorkerData(workerIdentifierID);
+                _workerController.AssignWorker(workerData);
+            }
         }
 
         private void InitController()
@@ -146,7 +154,7 @@ namespace Generators
 
         public void AssignWorker(string workerID)
         {
-            WorkerData workerData = _generatorManager.GetWorkerData(workerID);
+            WorkerData workerData = _workerManager.GetWorkerData(workerID);
             if (_workerController.AssignWorker(workerData))
             {
                 UserData.AssignedWorkerIdentifierID = workerID;

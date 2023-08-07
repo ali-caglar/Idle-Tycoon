@@ -16,3 +16,4 @@ MonoBehaviour:
     type: 2}
   defaultCurrenciesData: {fileID: 11400000, guid: 5741443a190df4d34a289b9143516a6d,
     type: 2}
+  workersListData: {fileID: 11400000, guid: 067f95379df964849b86911087c6f0e6, type: 2}

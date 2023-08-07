@@ -1,6 +1,7 @@
 using Currency;
 using TimeTick;
 using UnityEngine;
+using Workers;
 using Zenject;
 
 namespace Installers
@@ -10,11 +11,13 @@ namespace Installers
     {
         [SerializeField] private DefaultTimeTickControllersData defaultTimeTickControllersData;
         [SerializeField] private DefaultCurrenciesData defaultCurrenciesData;
+        [SerializeField] private WorkersListData workersListData;
 
         public override void InstallBindings()
         {
             Container.BindInstance(defaultTimeTickControllersData.DefaultControllers);
             Container.BindInstance(defaultCurrenciesData.DefaultCurrencies);
+            Container.BindInstance(workersListData.WorkersList);
         }
     }
 }
