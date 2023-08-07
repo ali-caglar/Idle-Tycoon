@@ -4,7 +4,7 @@ using Enums;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Generators
+namespace Workers
 {
     public class WorkerController : MonoBehaviour
     {
