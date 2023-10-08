@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Worker Data
   m_EditorClassIdentifier: 
   dataModelOnDeploy:
-    identifierID: 
-    displayName: 
+    identifierID: worker-profit-ali-4ab4eb34-626e-42ca-bc0d-2634923e1602
+    displayName: Ali
     costDataModel:
       costCurrencyType: 0
       unlockCost:
         mantissa: 0
         exponent: 0
     bonusDataModel:
-      bonusType: 0
-      bonusPercentage: 0
+      bonusType: 1
+      bonusPercentage: 20
