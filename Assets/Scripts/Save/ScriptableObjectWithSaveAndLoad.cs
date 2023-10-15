@@ -1,3 +1,4 @@
+using Enums.ID;
 using UnityEngine;
 using Utility;
 
@@ -10,11 +11,18 @@ namespace Save
     {
         #region FIELDS
 
+        [SerializeField, TextArea] private string explanation;
+
+        [Header("ID")]
+        [SerializeField] private WorldName worldName;
+        [SerializeField] private RegionName regionName;
+        [SerializeField] private UUID id;
+
+        [Header("Default Datas")]
         [SerializeField] private TDataModel defaultDataModel;
         [SerializeField] private TUserData defaultUserData;
 
         private TDataModel _dataModel;
-
         public TDataModel DataModel
         {
             get
@@ -29,7 +37,6 @@ namespace Save
         }
 
         private TUserData _userData;
-
         public TUserData UserData
         {
             get
@@ -70,10 +77,10 @@ namespace Save
 
         private void LoadDataModel()
         {
-            var dataModelFromStorage = DataManager<TDataModel>.Load();
+            var dataModelFromStorage = DataManager<TDataModel>.Load(defaultDataModel.ID.uniqueID);
             if (dataModelFromStorage == null)
             {
-                dataModelFromStorage = defaultDataModel.Clone();
+                dataModelFromStorage = defaultDataModel.Clone(id);
                 SaveDataModel(dataModelFromStorage);
             }
 
@@ -82,10 +89,10 @@ namespace Save
 
         private void LoadUserData()
         {
-            var dataModelFromStorage = DataManager<TUserData>.Load();
+            var dataModelFromStorage = DataManager<TUserData>.Load(defaultUserData.ID.uniqueID);
             if (dataModelFromStorage == null)
             {
-                dataModelFromStorage = defaultUserData.Clone();
+                dataModelFromStorage = defaultUserData.Clone(id);
                 SaveUserData(dataModelFromStorage);
             }
 
@@ -94,13 +101,39 @@ namespace Save
 
         private void SaveDataModel(TDataModel dataModel)
         {
-            DataManager<TDataModel>.Save(dataModel);
+            DataManager<TDataModel>.Save(dataModel, dataModel.ID.uniqueID);
         }
 
         private void SaveUserData(TUserData userData)
         {
-            DataManager<TUserData>.Save(userData);
+            DataManager<TUserData>.Save(userData, userData.ID.uniqueID);
         }
+
+        #endregion
+
+        #region VALIDATE
+
+#if UNITY_EDITOR
+
+        private void HandleID()
+        {
+            id.worldNumber = (uint)worldName;
+            id.regionNumber = (uint)regionName;
+            if (string.IsNullOrEmpty(id.uniqueID))
+            {
+                id.ChangeUniqueID();
+            }
+        }
+
+        private void OnValidate()
+        {
+            HandleID();
+            var idCopy = id.Clone();
+            defaultDataModel.ID = idCopy;
+            defaultUserData.ID = idCopy;
+        }
+
+#endif
 
         #endregion
     }

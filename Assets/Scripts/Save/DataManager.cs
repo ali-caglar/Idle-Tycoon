@@ -18,24 +18,25 @@ namespace Save
         private static readonly IDataService DataService = new NewtonsoftDataService();
 
         /// <summary>
-        /// Directory name of the saves
+        /// Path name of the save directory
         /// </summary>
-        private const string FolderName = "Saves";
+        private static readonly string DataPath = $"{Application.companyName}/{Application.productName}/";
 
         /// <summary>
-        /// File name of the save
+        /// Directory name of the saves
         /// </summary>
-        private static readonly string FileName = typeof(T).Name;
+        private static readonly string FolderName = typeof(T).Name;
 
         /// <summary>
         /// Save data to a file (overwrite completely)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
-        public static void Save(T data)
+        /// <param name="uniqueID"></param>
+        public static void Save(T data, string uniqueID)
         {
             // get the data path of this save data
-            string dataPath = GetFilePath(FolderName, FileName);
+            string dataPath = GetFilePath(FolderName, uniqueID);
 
             string jsonData = DataService.ConvertToJson(data);
             byte[] byteData = Encoding.UTF8.GetBytes(jsonData);
@@ -70,10 +71,10 @@ namespace Save
         /// Load all data at a specified file and folder location
         /// </summary>
         /// <returns></returns>
-        public static T Load()
+        public static T Load(string uniqueID)
         {
             // get the data path of this save data
-            string dataPath = GetFilePath(FolderName, FileName);
+            string dataPath = GetFilePath(FolderName, uniqueID);
 
             // if the file path or name does not exist, return the default SO
             if (!Directory.Exists(Path.GetDirectoryName(dataPath)))
@@ -152,25 +153,25 @@ namespace Save
             string filePath;
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             // mac
-            filePath = Path.Combine(Application.streamingAssetsPath, ("data/" + folderName));
+            filePath = Path.Combine(Application.streamingAssetsPath, (DataPath + folderName));
 
             if (fileName != "")
                 filePath = Path.Combine(filePath, (fileName + ".txt"));
 #elif UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         // windows
-        filePath = Path.Combine(Application.persistentDataPath, ("data/" + folderName));
+        filePath = Path.Combine(Application.persistentDataPath, (DataPath + folderName));
 
         if(fileName != "")
             filePath = Path.Combine(filePath, (fileName + ".txt"));
 #elif UNITY_ANDROID
         // android
-        filePath = Path.Combine(Application.persistentDataPath, ("data/" + folderName));
+        filePath = Path.Combine(Application.persistentDataPath, (DataPath + folderName));
 
         if(fileName != "")
             filePath = Path.Combine(filePath, (fileName + ".txt"));
 #elif UNITY_IOS
         // ios
-        filePath = Path.Combine(Application.persistentDataPath, ("data/" + folderName));
+        filePath = Path.Combine(Application.persistentDataPath, (DataPath + folderName));
 
         if(fileName != "")
             filePath = Path.Combine(filePath, (fileName + ".txt"));
