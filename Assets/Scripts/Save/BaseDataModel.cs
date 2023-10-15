@@ -1,14 +1,13 @@
 using System;
+using Utility.Attributes;
 
 namespace Save
 {
     [Serializable]
     public abstract class BaseDataModel<T>
     {
-        public string identifier;
-        public uint worldNumber;
-        public uint regionNumber;
+        [ReadOnly] public UUID ID;
 
-        public abstract T Clone();
+        public abstract T Clone(UUID id);
     }
 }
