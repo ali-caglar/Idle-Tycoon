@@ -30,7 +30,7 @@ namespace Utility
 
         private static void ResetAllIResetOnPlayModeExitAssets()
         {
-            var resetAssets = Resources.FindObjectsOfTypeAll<ScriptableObject>()
+            var resetAssets = Resources.FindObjectsOfTypeAll<Object>()
                 .OfType<IResetOnPlaymodeExit>()
                 .ToArray();
 
