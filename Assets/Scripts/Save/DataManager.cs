@@ -108,6 +108,39 @@ namespace Save
         }
 
         /// <summary>
+        /// Deletes all data underneath save folder
+        /// </summary>
+        public static void ClearAll()
+        {
+            // get the data path of save folder
+            string dataPath = GetFilePath("");
+
+            // if the path not exist, exit
+            if (!Directory.Exists(Path.GetDirectoryName(dataPath)))
+            {
+                return;
+            }
+
+            try
+            {
+                DirectoryInfo folderToDelete = new DirectoryInfo(dataPath);
+                folderToDelete.Delete(true);
+                Debug.Log("<color=green>Deleted all data under: </color>" + dataPath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Failed to delete data under: " + dataPath);
+                Debug.LogWarning("Error: " + e.Message);
+                throw;
+            }
+
+#if UNITY_EDITOR
+            // refreshing unity to update files
+            UnityEditor.AssetDatabase.Refresh();
+#endif
+        }
+
+        /// <summary>
         /// Create file path for where a file is stored on the specific platform given a folder name and file name
         /// </summary>
         /// <param name="folderName"></param>
