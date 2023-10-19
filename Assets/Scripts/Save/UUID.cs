@@ -1,4 +1,5 @@
 using System;
+using Enums.ID;
 
 namespace Save
 {
@@ -8,8 +9,19 @@ namespace Save
         #region FIELDS
 
         public string uniqueID;
-        public uint worldNumber;
-        public uint regionNumber;
+        public WorldName worldName;
+        public RegionName regionName;
+
+        #endregion
+
+        #region CONSTRUCTOR
+
+        public UUID(string uniqueID, WorldName worldName, RegionName regionName)
+        {
+            this.uniqueID = uniqueID;
+            this.worldName = worldName;
+            this.regionName = regionName;
+        }
 
         #endregion
 
@@ -17,14 +29,7 @@ namespace Save
 
         public UUID Clone()
         {
-            var copy = new UUID
-            {
-                uniqueID = this.uniqueID,
-                worldNumber = this.worldNumber,
-                regionNumber = this.regionNumber
-            };
-
-            return copy;
+            return new UUID(this.uniqueID, this.worldName, this.regionName);
         }
 
         public void ChangeUniqueID()

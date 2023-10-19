@@ -1,11 +1,10 @@
-using Enums.ID;
+using System;
+using UnityEditor;
 using UnityEngine;
-using Utility;
 
 namespace Save
 {
-    public abstract class ScriptableObjectWithSaveAndLoad<TDataModel, TUserData> : ScriptableObject,
-        IResetOnPlaymodeExit
+    public abstract class ScriptableObjectWithSaveAndLoad<TDataModel, TUserData> : ScriptableObject
         where TDataModel : BaseDataModel<TDataModel>
         where TUserData : BaseDataModel<TUserData>
     {
@@ -13,12 +12,8 @@ namespace Save
 
         [SerializeField, TextArea] private string explanation;
 
-        [Header("ID")]
-        [SerializeField] private WorldName worldName;
-        [SerializeField] private RegionName regionName;
-        [SerializeField] private UUID id;
-
         [Header("Default Datas")]
+        [SerializeField] private UUID id;
         [SerializeField] private TDataModel defaultDataModel;
         [SerializeField] private TUserData defaultUserData;
 
@@ -57,9 +52,23 @@ namespace Save
 
         #endregion
 
-        #region INTERFACE METHODS
+        #region UNITY METHODS
 
-        public void PlaymodeExitReset()
+#if !UNITY_EDITOR
+        protected void OnEnable() => OnBegin();
+        protected void OnDisable() => OnEnd();
+#endif
+
+        #endregion
+
+        #region PRIVATE METHODS
+
+        protected virtual void OnBegin()
+        {
+            Load();
+        }
+
+        protected virtual void OnEnd()
         {
             _dataModel = null;
             _userData = null;
@@ -69,7 +78,7 @@ namespace Save
 
         #region SAVE&LOAD
 
-        public void Load()
+        private void Load()
         {
             LoadDataModel();
             LoadUserData();
@@ -111,19 +120,12 @@ namespace Save
 
         #endregion
 
-        #region VALIDATE
+        #region EDITOR CHECK
 
 #if UNITY_EDITOR
 
-        private void HandleID()
-        {
-            id.worldNumber = (uint)worldName;
-            id.regionNumber = (uint)regionName;
-            if (string.IsNullOrEmpty(id.uniqueID))
-            {
-                id.ChangeUniqueID();
-            }
-        }
+        protected void OnEnable() => EditorApplication.playModeStateChanged += OnPlayStateChange;
+        protected void OnDisable() => EditorApplication.playModeStateChanged -= OnPlayStateChange;
 
         private void OnValidate()
         {
@@ -131,6 +133,34 @@ namespace Save
             var idCopy = id.Clone();
             defaultDataModel.ID = idCopy;
             defaultUserData.ID = idCopy;
+        }
+
+        private void HandleID()
+        {
+            if (string.IsNullOrEmpty(id.uniqueID))
+            {
+                id.ChangeUniqueID();
+            }
+        }
+
+
+        private void OnPlayStateChange(PlayModeStateChange state)
+        {
+            switch (state)
+            {
+                case PlayModeStateChange.EnteredPlayMode:
+                    OnBegin();
+                    break;
+                case PlayModeStateChange.ExitingPlayMode:
+                    OnEnd();
+                    break;
+                case PlayModeStateChange.EnteredEditMode:
+                    break;
+                case PlayModeStateChange.ExitingEditMode:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
+            }
         }
 
 #endif
