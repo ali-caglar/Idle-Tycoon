@@ -129,20 +129,21 @@ namespace Save
 
         private void OnValidate()
         {
-            HandleID();
+            if (string.IsNullOrEmpty(id.uniqueID))
+            {
+                ChangeID();
+            }
+
             var idCopy = id.Clone();
             defaultDataModel.ID = idCopy;
             defaultUserData.ID = idCopy;
         }
 
-        private void HandleID()
+        [ContextMenu("Change ID")]
+        private void ChangeID()
         {
-            if (string.IsNullOrEmpty(id.uniqueID))
-            {
-                id.ChangeUniqueID();
-            }
+            id.ChangeUniqueID();
         }
-
 
         private void OnPlayStateChange(PlayModeStateChange state)
         {
