@@ -87,11 +87,15 @@ namespace Save.ScriptableObjects
 
                 return _userData;
             }
-            set
-            {
-                _userData = value;
-                SaveData(_userData);
-            }
+        }
+
+        #endregion
+
+        #region PUBLIC METHODS
+
+        public void SaveUserData()
+        {
+            SaveData(_userData);
         }
 
         #endregion
