@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02c35a041882493c9a7a2b6aa743e044, type: 3}
+  m_Name: Demo Save Data 1
+  m_EditorClassIdentifier: 
+  explanation: 
+  id:
+    uniqueID: 2591f756-94ac-463f-8d2d-17826ce70399
+    worldName: 0
+    regionName: 1
+  defaultDataModel:
+    ID:
+      uniqueID: 2591f756-94ac-463f-8d2d-17826ce70399
+      worldName: 0
+      regionName: 1
+    year: 1997
+    alias: ali
+    isWorking: 0
+    timer: 1.923
+    baro:
+      unlockPrice: 6543
