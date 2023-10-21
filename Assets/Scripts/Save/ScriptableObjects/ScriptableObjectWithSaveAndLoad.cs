@@ -14,7 +14,7 @@ namespace Save.ScriptableObjects
         {
             get
             {
-                if (_dataModel == null)
+                if (_dataModel == null || string.IsNullOrEmpty(_dataModel.ID.uniqueID))
                 {
                     LoadDataModel();
                 }
@@ -80,7 +80,7 @@ namespace Save.ScriptableObjects
         {
             get
             {
-                if (_dataModel == null)
+                if (_userData == null || string.IsNullOrEmpty(_userData.ID.uniqueID))
                 {
                     LoadUserData();
                 }
