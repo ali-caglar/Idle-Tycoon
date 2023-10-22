@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4cbcacd02de46b6852bf0f6dddfadab, type: 3}
+  m_Name: Demo Save Data With User Data 2
+  m_EditorClassIdentifier: 
+  explanation: 
+  id:
+    uniqueID: fc7949e6-f72c-451c-8ae2-df3ef2136dbf
+    worldName: 0
+    regionName: 0
+  defaultDataModel:
+    ID:
+      uniqueID: fc7949e6-f72c-451c-8ae2-df3ef2136dbf
+      worldName: 0
+      regionName: 0
+    birthPlace: ankara
+    age: 24
+    initialMoney: 99
+  defaultUserData:
+    ID:
+      uniqueID: fc7949e6-f72c-451c-8ae2-df3ef2136dbf
+      worldName: 0
+      regionName: 0
+    userName: caglar
+    currentMoney: 999
