@@ -26,7 +26,7 @@ namespace Save.ScriptableObjects
 
         #region PRIVATE METHODS
 
-        protected virtual T LoadData<T>(T defaultData) where T : BaseDataModel<T>
+        protected T LoadData<T>(T defaultData) where T : BaseDataModel<T>
         {
             var dataModelFromStorage = DataManager<T>.Load(defaultData.ID.uniqueID);
             if (dataModelFromStorage == null)
@@ -38,7 +38,7 @@ namespace Save.ScriptableObjects
             return dataModelFromStorage;
         }
 
-        protected virtual void SaveData<T>(T dataModel) where T : BaseDataModel<T>
+        protected void SaveData<T>(T dataModel) where T : BaseDataModel<T>
         {
             DataManager<T>.Save(dataModel, dataModel.ID.uniqueID);
         }
@@ -49,6 +49,15 @@ namespace Save.ScriptableObjects
             {
                 ChangeID();
             }
+        }
+
+#if UNITY_EDITOR
+        
+        [ContextMenu("Change ID")]
+#endif
+        private void ChangeID()
+        {
+            id.ChangeUniqueID();
         }
 
         #endregion
@@ -77,12 +86,6 @@ namespace Save.ScriptableObjects
         private void OnValidate()
         {
             HandleUniqueIdOnValidate();
-        }
-
-        [ContextMenu("Change ID")]
-        private void ChangeID()
-        {
-            id.ChangeUniqueID();
         }
 
         private void OnPlayStateChange(PlayModeStateChange state)
