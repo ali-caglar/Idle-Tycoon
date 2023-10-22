@@ -1,9 +1,7 @@
 using Save.ScriptableObjects;
-using UnityEngine;
 
 namespace Save.Demo.Scripts
 {
-    [CreateAssetMenu(fileName = "temp", menuName = "temp2", order = 0)]
     public class DemoSaveDataWithUserData : ScriptableObjectWithSaveAndLoad<DemoSaveFoo, DemoSaveBar>
     {
         
