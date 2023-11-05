@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Save.DataServices
 {
-    public class NewtonsoftDataService : IDataService
+    public class NewtonsoftSerializationService : ISerializationService
     {
         public string ConvertToJson<T>(T data)
         {

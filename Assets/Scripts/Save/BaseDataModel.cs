@@ -9,7 +9,7 @@ namespace Save
     {
         [ReadOnly] public UUID ID;
 
-        private IDataService _dataService = new NewtonsoftDataService();
+        private ISerializationService SerializationService => DataManager<T>.SerializationService;
 
         /// <summary>
         /// Clones this object (not copies private fields)
@@ -20,8 +20,8 @@ namespace Save
         {
             ID = id.Clone();
 
-            string json = _dataService.ConvertToJson(this);
-            T returnedData = _dataService.ConvertFromJson<T>(json);
+            string json = SerializationService.ConvertToJson(this);
+            T returnedData = SerializationService.ConvertFromJson<T>(json);
             return (T)Convert.ChangeType(returnedData, typeof(T));
         }
     }

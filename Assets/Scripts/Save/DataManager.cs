@@ -15,7 +15,7 @@ namespace Save
         /// <summary>
         /// Json serialize service
         /// </summary>
-        private static readonly IDataService DataService = new NewtonsoftDataService();
+        public static readonly ISerializationService SerializationService = new NewtonsoftSerializationService();
 
         /// <summary>
         /// Path name of the save directory
@@ -38,7 +38,7 @@ namespace Save
             // get the data path of this save data
             string dataPath = GetFilePath(FolderName, uniqueID);
 
-            string jsonData = DataService.ConvertToJson(data);
+            string jsonData = SerializationService.ConvertToJson(data);
             byte[] byteData = Encoding.UTF8.GetBytes(jsonData);
 
             // create the file in the path if it doesn't exist
@@ -102,7 +102,7 @@ namespace Save
             string jsonData = Encoding.UTF8.GetString(jsonDataAsBytes);
 
             // convert to the specified object type
-            T returnedData = DataService.ConvertFromJson<T>(jsonData);
+            T returnedData = SerializationService.ConvertFromJson<T>(jsonData);
 
             // return the casted json object to use
             return (T)Convert.ChangeType(returnedData, typeof(T));
@@ -126,7 +126,7 @@ namespace Save
             {
                 DirectoryInfo folderToDelete = new DirectoryInfo(dataPath);
                 folderToDelete.Delete(true);
-                Debug.Log("<color=green>Deleted all data under: </color>" + dataPath);
+                Debug.Log("<color=red>Deleted all data under: </color>" + dataPath);
             }
             catch (Exception e)
             {
