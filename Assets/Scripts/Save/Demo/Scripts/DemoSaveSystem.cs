@@ -1,5 +1,5 @@
-using System;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,12 +21,43 @@ namespace Save.Demo.Scripts
         public TextMeshProUGUI demoSaveUserDataModel2TMP;
         public Button changeUserData2Button;
 
+        [Header("Async")]
+        public DemoSaveAndLoadAsyncSaveDataWithSaveAndLoadUserData demoSaveAndLoadAsyncSaveWithSaveAndLoadUserData;
+        public TextMeshProUGUI demoAsyncSaveDataModelTMP;
+        public Button[] demoAsyncSaveDataButtons;
+
+        private StringBuilder _sb;
+
         private void Awake()
         {
             UpdateText(demoSaveData1TMP, demoSaveData1);
             UpdateText(demoSaveData2TMP, demoSaveData2);
             UpdateText(demoSaveDataModel1TMP, demoSaveUserDataModel1TMP, changeUserData1Button, demoSaveWithUserData1);
             UpdateText(demoSaveDataModel2TMP, demoSaveUserDataModel2TMP, changeUserData2Button, demoSaveWithUserData2);
+
+            _sb = new StringBuilder();
+            UpdateText(_sb, demoAsyncSaveDataModelTMP, demoSaveAndLoadAsyncSaveWithSaveAndLoadUserData);
+        }
+
+        private async void Start()
+        {
+            await demoSaveAndLoadAsyncSaveWithSaveAndLoadUserData.InitializeAsync();
+            var unityEvent = UniTask.UnityAction(async () => { await IncreaseAttemptAndSave(); });
+            foreach (var button in demoAsyncSaveDataButtons)
+            {
+                button.onClick.AddListener(unityEvent);
+            }
+        }
+
+        private async UniTask IncreaseAttemptAndSave()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                demoSaveAndLoadAsyncSaveWithSaveAndLoadUserData.UserData.attemptCount++;
+                await demoSaveAndLoadAsyncSaveWithSaveAndLoadUserData.SaveUserData();
+                UpdateText(_sb, demoAsyncSaveDataModelTMP, demoSaveAndLoadAsyncSaveWithSaveAndLoadUserData);
+                Debug.Log(demoSaveAndLoadAsyncSaveWithSaveAndLoadUserData.UserData.attemptCount);
+            }
         }
 
         private void UpdateText(TextMeshProUGUI tmp, DemoSaveData saveData)
@@ -95,6 +126,25 @@ namespace Save.Demo.Scripts
                 sb.AppendLine();
                 userDataTmp.SetText(sb.ToString());
             }
+        }
+
+        private void UpdateText(StringBuilder sb, TextMeshProUGUI tmp, DemoSaveAndLoadAsyncSaveDataWithSaveAndLoadUserData saveData)
+        {
+            sb.Clear();
+            sb.Append(saveData.DataModel.ID.uniqueID);
+            sb.AppendLine();
+            sb.Append(saveData.DataModel.ID.worldName.ToString());
+            sb.AppendLine();
+            sb.Append(saveData.DataModel.ID.regionName.ToString());
+            sb.AppendLine();
+            sb.Append("alias: " + saveData.DataModel.alias);
+            sb.AppendLine();
+            sb.Append("age: " + saveData.DataModel.age);
+            sb.AppendLine();
+            sb.Append("isWorking: " + saveData.UserData.attemptCount);
+            sb.AppendLine();
+
+            tmp.SetText(sb.ToString());
         }
     }
 }

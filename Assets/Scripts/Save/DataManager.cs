@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Save.DataServices;
 using UnityEngine;
 
@@ -68,6 +71,49 @@ namespace Save
         }
 
         /// <summary>
+        /// Save data to a file (overwrite completely)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="uniqueID"></param>
+        /// <param name="cancellationTokenSource"></param>
+        public static async UniTask SaveAsync(T data, string uniqueID, CancellationTokenSource cancellationTokenSource)
+        {
+            if (cancellationTokenSource == null || cancellationTokenSource.IsCancellationRequested) return;
+
+            // get the data path of this save data
+            string dataPath = GetFilePath(FolderName, uniqueID);
+
+            string jsonData = SerializationService.ConvertToJson(data);
+            byte[] byteData = Encoding.UTF8.GetBytes(jsonData);
+
+            // create the file in the path if it doesn't exist
+            // if the file path or name does not exist, return the default SO
+            if (!Directory.Exists(Path.GetDirectoryName(dataPath)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(dataPath));
+            }
+
+            // attempt to save here data
+            try
+            {
+                // save data here
+                await File.WriteAllBytesAsync(dataPath, byteData, cancellationTokenSource.Token).AsUniTask();
+                Debug.Log("Save data to: " + dataPath);
+#if UNITY_EDITOR
+                // refreshing unity to show files
+                UnityEditor.AssetDatabase.Refresh();
+#endif
+            }
+            catch (Exception e)
+            {
+                // write out error here
+                Debug.LogError("Failed to save data to: " + dataPath);
+                Debug.LogError("Error " + e.Message);
+            }
+        }
+
+        /// <summary>
         /// Load all data at a specified file and folder location
         /// </summary>
         /// <returns></returns>
@@ -89,6 +135,49 @@ namespace Save
             try
             {
                 jsonDataAsBytes = File.ReadAllBytes(dataPath);
+                Debug.Log("<color=green>Loaded all data from: </color>" + dataPath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Failed to load data from: " + dataPath);
+                Debug.LogWarning("Error: " + e.Message);
+                return default(T);
+            }
+
+            // convert the byte array to json
+            string jsonData = Encoding.UTF8.GetString(jsonDataAsBytes);
+
+            // convert to the specified object type
+            T returnedData = SerializationService.ConvertFromJson<T>(jsonData);
+
+            // return the casted json object to use
+            return (T)Convert.ChangeType(returnedData, typeof(T));
+        }
+
+        /// <summary>
+        /// Load all data at a specified file and folder location
+        /// </summary>
+        /// <returns></returns>
+        public static async UniTask<T> LoadAsync(string uniqueID, CancellationTokenSource cancellationTokenSource)
+        {
+            if (cancellationTokenSource == null || cancellationTokenSource.IsCancellationRequested) return default(T);
+
+            // get the data path of this save data
+            string dataPath = GetFilePath(FolderName, uniqueID);
+
+            // if the file path or name does not exist, return the default SO
+            if (!Directory.Exists(Path.GetDirectoryName(dataPath)))
+            {
+                Debug.LogWarning("File or path does not exist! " + dataPath);
+                return default(T);
+            }
+
+            // load in the save data as byte array
+            byte[] jsonDataAsBytes;
+
+            try
+            {
+                jsonDataAsBytes = await File.ReadAllBytesAsync(dataPath, cancellationTokenSource.Token).AsUniTask();
                 Debug.Log("<color=green>Loaded all data from: </color>" + dataPath);
             }
             catch (Exception e)

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bbbed4841b74909ae915a2e64ba1b63, type: 3}
+  m_Name: Demo Async Save Data With User Data
+  m_EditorClassIdentifier: 
+  explanation: 
+  id:
+    uniqueID: cbc4e742-9806-44c8-a8cc-77fd29825ffa
+    worldName: 0
+    regionName: 0
+  defaultDataModel:
+    ID:
+      uniqueID: cbc4e742-9806-44c8-a8cc-77fd29825ffa
+      worldName: 0
+      regionName: 0
+    alias: hey ya hey
+    age: 26
+  defaultUserData:
+    ID:
+      uniqueID: cbc4e742-9806-44c8-a8cc-77fd29825ffa
+      worldName: 0
+      regionName: 0
+    attemptCount: 0
