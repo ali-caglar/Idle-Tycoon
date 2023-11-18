@@ -63,7 +63,7 @@ namespace Save.ScriptableObjects
 
         #region SAVE&LOAD
 
-        public virtual async UniTask InitializeAsync()
+        public override async UniTask InitializeAsync()
         {
             CancelTokenSource ??= new CancellationTokenSource();
             await LoadDataModel();

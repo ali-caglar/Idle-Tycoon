@@ -2,10 +2,10 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Save.DataServices;
 using UnityEngine;
+using Logger = Utility.Logger;
 
 namespace Save
 {
@@ -16,11 +16,6 @@ namespace Save
     public static class DataManager<T>
     {
         /// <summary>
-        /// Json serialize service
-        /// </summary>
-        public static readonly ISerializationService SerializationService = new NewtonsoftSerializationService();
-
-        /// <summary>
         /// Path name of the save directory
         /// </summary>
         private static readonly string DataPath = $"{Application.companyName}/{Application.productName}/";
@@ -29,6 +24,11 @@ namespace Save
         /// Directory name of the saves
         /// </summary>
         private static readonly string FolderName = typeof(T).Name;
+
+        /// <summary>
+        /// Json serialize service
+        /// </summary>
+        private static readonly ISerializationService SerializationService = new NewtonsoftSerializationService();
 
         /// <summary>
         /// Save data to a file (overwrite completely)
@@ -56,7 +56,7 @@ namespace Save
             {
                 // save data here
                 File.WriteAllBytes(dataPath, byteData);
-                Debug.Log("Save data to: " + dataPath);
+                Logger.Log(LogType.Log, "Save data to: " + dataPath);
 #if UNITY_EDITOR
                 // refreshing unity to show files
                 UnityEditor.AssetDatabase.Refresh();
@@ -65,8 +65,8 @@ namespace Save
             catch (Exception e)
             {
                 // write out error here
-                Debug.LogError("Failed to save data to: " + dataPath);
-                Debug.LogError("Error " + e.Message);
+                Logger.Log(LogType.Error, "Failed to save data to: " + dataPath);
+                Logger.Log(LogType.Error, "Error " + e.Message);
             }
         }
 
@@ -99,7 +99,7 @@ namespace Save
             {
                 // save data here
                 await File.WriteAllBytesAsync(dataPath, byteData, cancellationTokenSource.Token).AsUniTask();
-                Debug.Log("Save data to: " + dataPath);
+                Logger.Log(LogType.Log, "Save data to: " + dataPath);
 #if UNITY_EDITOR
                 // refreshing unity to show files
                 UnityEditor.AssetDatabase.Refresh();
@@ -108,8 +108,8 @@ namespace Save
             catch (Exception e)
             {
                 // write out error here
-                Debug.LogError("Failed to save data to: " + dataPath);
-                Debug.LogError("Error " + e.Message);
+                Logger.Log(LogType.Error, "Failed to save data to: " + dataPath);
+                Logger.Log(LogType.Error, "Error " + e.Message);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Save
             // if the file path or name does not exist, return the default SO
             if (!Directory.Exists(Path.GetDirectoryName(dataPath)))
             {
-                Debug.LogWarning("File or path does not exist! " + dataPath);
+                Logger.Log(LogType.Warning, "File or path does not exist! " + dataPath);
                 return default(T);
             }
 
@@ -135,12 +135,12 @@ namespace Save
             try
             {
                 jsonDataAsBytes = File.ReadAllBytes(dataPath);
-                Debug.Log("<color=green>Loaded all data from: </color>" + dataPath);
+                Logger.Log(LogType.Log, "<color=green>Loaded all data from: </color>" + dataPath);
             }
             catch (Exception e)
             {
-                Debug.LogWarning("Failed to load data from: " + dataPath);
-                Debug.LogWarning("Error: " + e.Message);
+                Logger.Log(LogType.Warning, "Failed to load data from: " + dataPath);
+                Logger.Log(LogType.Warning, "Error: " + e.Message);
                 return default(T);
             }
 
@@ -168,7 +168,7 @@ namespace Save
             // if the file path or name does not exist, return the default SO
             if (!Directory.Exists(Path.GetDirectoryName(dataPath)))
             {
-                Debug.LogWarning("File or path does not exist! " + dataPath);
+                Logger.Log(LogType.Warning, "File or path does not exist! " + dataPath);
                 return default(T);
             }
 
@@ -178,12 +178,12 @@ namespace Save
             try
             {
                 jsonDataAsBytes = await File.ReadAllBytesAsync(dataPath, cancellationTokenSource.Token).AsUniTask();
-                Debug.Log("<color=green>Loaded all data from: </color>" + dataPath);
+                Logger.Log(LogType.Log, "<color=green>Loaded all data from: </color>" + dataPath);
             }
             catch (Exception e)
             {
-                Debug.LogWarning("Failed to load data from: " + dataPath);
-                Debug.LogWarning("Error: " + e.Message);
+                Logger.Log(LogType.Warning, "Failed to load data from: " + dataPath);
+                Logger.Log(LogType.Warning, "Error: " + e.Message);
                 return default(T);
             }
 
@@ -215,12 +215,12 @@ namespace Save
             {
                 DirectoryInfo folderToDelete = new DirectoryInfo(dataPath);
                 folderToDelete.Delete(true);
-                Debug.Log("<color=red>Deleted all data under: </color>" + dataPath);
+                Logger.Log(LogType.Log, "<color=red>Deleted all data under: </color>" + dataPath);
             }
             catch (Exception e)
             {
-                Debug.LogWarning("Failed to delete data under: " + dataPath);
-                Debug.LogWarning("Error: " + e.Message);
+                Logger.Log(LogType.Warning, "Failed to delete data under: " + dataPath);
+                Logger.Log(LogType.Warning, "Error: " + e.Message);
                 throw;
             }
 

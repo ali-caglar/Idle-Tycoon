@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 
 namespace Save.ScriptableObjects
 {
-    public abstract class BaseScriptableObjectWithSaveAndLoadAsync : BaseScriptableObjectWithSaveAndLoad
+    public abstract class BaseScriptableObjectWithSaveAndLoadAsync : BaseSOWithSaveAndLoad
     {
         #region FIELDS
 
@@ -29,6 +29,15 @@ namespace Save.ScriptableObjects
         {
             await DataManager<T>.SaveAsync(dataModel, dataModel.ID.uniqueID, CancelTokenSource);
         }
+
+        #endregion
+
+        #region ABSTRACT METHODS
+
+        /// <summary>
+        /// Initialize Method by async
+        /// </summary>
+        public abstract UniTask InitializeAsync();
 
         #endregion
     }

@@ -1,6 +1,7 @@
 using System;
 using Save.DataServices;
 using Utility.Attributes;
+using Zenject;
 
 namespace Save
 {
@@ -9,7 +10,11 @@ namespace Save
     {
         [ReadOnly] public UUID ID;
 
-        private ISerializationService SerializationService => DataManager<T>.SerializationService;
+        /// <summary>
+        /// Json serialize service
+        /// </summary>
+        [Inject]
+        private ISerializationService _serializationService;
 
         /// <summary>
         /// Clones this object (not copies private fields)
@@ -20,8 +25,8 @@ namespace Save
         {
             ID = id.Clone();
 
-            string json = SerializationService.ConvertToJson(this);
-            T returnedData = SerializationService.ConvertFromJson<T>(json);
+            string json = _serializationService.ConvertToJson(this);
+            T returnedData = _serializationService.ConvertFromJson<T>(json);
             return (T)Convert.ChangeType(returnedData, typeof(T));
         }
     }

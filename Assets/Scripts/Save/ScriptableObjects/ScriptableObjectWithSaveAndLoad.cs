@@ -29,7 +29,7 @@ namespace Save.ScriptableObjects
 
         protected override void OnBegin()
         {
-            Load();
+            Initialize();
         }
 
         protected override void OnEnd()
@@ -54,7 +54,7 @@ namespace Save.ScriptableObjects
 
         #region SAVE&LOAD
 
-        protected virtual void Load()
+        public override void Initialize()
         {
             LoadDataModel();
         }
@@ -120,9 +120,9 @@ namespace Save.ScriptableObjects
 
         #region SAVE&LOAD
 
-        protected override void Load()
+        public override void Initialize()
         {
-            base.Load();
+            base.Initialize();
             LoadUserData();
         }
 
