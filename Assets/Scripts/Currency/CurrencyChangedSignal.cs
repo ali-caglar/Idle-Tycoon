@@ -1,7 +1,9 @@
+using Datas.DataModels.Currencies;
+
 namespace Currency
 {
     public class CurrencyChangedSignal
     {
-        public CurrencyData CurrencyData;
+        public CurrencyDataModel CurrencyDataModel;
     }
 }

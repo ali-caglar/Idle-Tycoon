@@ -3,7 +3,7 @@ using Zenject;
 
 namespace Installers
 {
-    public class ProjectInstaller : MonoInstaller
+    public class ProjectInstaller : MonoInstaller<ProjectInstaller>
     {
         private NewtonsoftSerializationService _serializationService = new NewtonsoftSerializationService();
 

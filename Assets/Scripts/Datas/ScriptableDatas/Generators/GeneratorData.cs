@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Datas.ScriptableDatas.Generators
 {
-    [CreateAssetMenu(fileName = "Generator Data", menuName = "Datas/Generator/Generator Data", order = 0)]
+    [CreateAssetMenu(fileName = "Generator Data", menuName = "Data/Generator/Generator Data", order = 0)]
     public class GeneratorData : DataHandlerScriptableObject
     {
         #region SERIALIZED PRIVATE FIELDS

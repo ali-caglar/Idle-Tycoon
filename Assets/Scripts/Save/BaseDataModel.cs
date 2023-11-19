@@ -17,6 +17,11 @@ namespace Save
         private ISerializationService _serializationService;
 
         /// <summary>
+        /// Json serialize service
+        /// </summary>
+        private ISerializationService SerializationService => _serializationService ??= new NewtonsoftSerializationService();
+
+        /// <summary>
         /// Clones this object (not copies private fields)
         /// </summary>
         /// <param name="id">Id to clone</param>
@@ -25,8 +30,8 @@ namespace Save
         {
             ID = id.Clone();
 
-            string json = _serializationService.ConvertToJson(this);
-            T returnedData = _serializationService.ConvertFromJson<T>(json);
+            string json = SerializationService.ConvertToJson(this);
+            T returnedData = SerializationService.ConvertFromJson<T>(json);
             return (T)Convert.ChangeType(returnedData, typeof(T));
         }
     }

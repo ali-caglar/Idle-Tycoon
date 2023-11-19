@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BreakInfinity;
 using Currency;
+using Datas.ScriptableDatas.Currencies;
 using Enums;
 using Installers;
 using NUnit.Framework;
@@ -14,6 +15,7 @@ namespace Tests.CurrencyTests
     public class TestCurrencyController : ZenjectUnitTestFixture
     {
         private const string SettingsInstallerPath = "Installers/SettingsInstaller";
+        private const string ProjectInstallerPath = "ProjectContext";
         [Inject] private SignalBus _signalBus;
         [Inject] private List<CurrencyData> _currencyDatas;
 
@@ -31,6 +33,7 @@ namespace Tests.CurrencyTests
         [SetUp]
         public void BindSettings()
         {
+            ProjectInstaller.InstallFromResource(ProjectInstallerPath, Container);
             SignalBusInstaller.Install(Container);
             SettingsInstaller.InstallFromResource(SettingsInstallerPath, Container);
 
@@ -41,10 +44,10 @@ namespace Tests.CurrencyTests
         private CurrencyController CreateNewCurrencyController(CurrencyType currencyType, bool isMoneyOverride = false,
             BigDouble overrideMoney = default)
         {
-            var data = _currencyDatas.FirstOrDefault(x => x.currencyType == currencyType);
+            var data = _currencyDatas.FirstOrDefault(x => x.UserData.currencyType == currencyType);
             if (isMoneyOverride)
             {
-                data.currentAmount = overrideMoney;
+                data.UserData.currentAmount = overrideMoney;
             }
 
             var controller = new CurrencyController(_signalBus, data);
@@ -54,8 +57,8 @@ namespace Tests.CurrencyTests
 
         private BigDouble GetStartValue(CurrencyType currencyType)
         {
-            var data = _currencyDatas.FirstOrDefault(x => x.currencyType == currencyType);
-            return data.currentAmount;
+            var data = _currencyDatas.FirstOrDefault(x => x.UserData.currencyType == currencyType);
+            return data.UserData.currentAmount;
         }
 
         [Test]
@@ -281,7 +284,7 @@ namespace Tests.CurrencyTests
 
             Action<CurrencyChangedSignal> eventCallback = currencyData =>
             {
-                moneyFromAction = currencyData.CurrencyData.currentAmount;
+                moneyFromAction = currencyData.CurrencyDataModel.currentAmount;
             };
 
             _signalBus.Subscribe(eventCallback);
@@ -314,7 +317,7 @@ namespace Tests.CurrencyTests
 
             Action<CurrencyChangedSignal> eventCallback = currencyData =>
             {
-                moneyFromAction = currencyData.CurrencyData.currentAmount;
+                moneyFromAction = currencyData.CurrencyDataModel.currentAmount;
             };
 
             _signalBus.Subscribe(eventCallback);

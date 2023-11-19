@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using Datas.DataModels.Currencies;
 using UnityEngine;
 
-namespace Currency
+namespace Datas.ScriptableDatas.Currencies
 {
-    [CreateAssetMenu(fileName = "Default Currencies Data", menuName = "Data/Currency/Default Data", order = 0)]
+    [CreateAssetMenu(fileName = "Default Currencies Data", menuName = "Data/Currency/Default Currency List Data", order = 0)]
     public class DefaultCurrenciesData : ScriptableObject
     {
         [SerializeField] private List<CurrencyData> defaultDatas;

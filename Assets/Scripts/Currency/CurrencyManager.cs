@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using BreakInfinity;
+using Cysharp.Threading.Tasks;
+using Datas.ScriptableDatas.Currencies;
 using Enums;
 using Zenject;
 
@@ -18,7 +20,7 @@ namespace Currency
 
             foreach (var currencyData in defaultCurrencies)
             {
-                var currencyType = currencyData.currencyType;
+                var currencyType = currencyData.UserData.currencyType;
                 _currencyControllerDictionary[currencyType] = new CurrencyController(signalBus, currencyData);
             }
         }
@@ -29,16 +31,16 @@ namespace Currency
             return currencyController.CurrentAmount;
         }
 
-        public void AddAmount(CurrencyType currencyTypeToAdd, BigDouble amountToAdd)
+        public async UniTask AddAmount(CurrencyType currencyTypeToAdd, BigDouble amountToAdd)
         {
             var currencyController = GetCurrencyController(currencyTypeToAdd);
-            currencyController.AddAmount(amountToAdd);
+            await currencyController.AddAmount(amountToAdd);
         }
 
-        public void SubtractAmount(CurrencyType currencyTypeToSubtract, BigDouble amountToSubtract)
+        public async UniTask SubtractAmount(CurrencyType currencyTypeToSubtract, BigDouble amountToSubtract)
         {
             var currencyController = GetCurrencyController(currencyTypeToSubtract);
-            currencyController.SubtractAmount(amountToSubtract);
+            await currencyController.SubtractAmount(amountToSubtract);
         }
 
         public bool HasEnoughAmount(CurrencyType currencyTypeToCheck, BigDouble amountToCheck)

@@ -13,11 +13,5 @@ MonoBehaviour:
   m_Name: Default Currencies Data
   m_EditorClassIdentifier: 
   defaultDatas:
-  - currencyType: 0
-    currentAmount:
-      mantissa: 5
-      exponent: 0
-  - currencyType: 1
-    currentAmount:
-      mantissa: 0
-      exponent: 0
+  - {fileID: 11400000, guid: de99b8fc5ae114a50928ad83593d5615, type: 2}
+  - {fileID: 11400000, guid: a91f7cbc9f102478882e00a0f16037f1, type: 2}

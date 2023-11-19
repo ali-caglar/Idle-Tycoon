@@ -1,6 +1,7 @@
 using BreakInfinity;
+using Cysharp.Threading.Tasks;
+using Datas.ScriptableDatas.Currencies;
 using Enums;
-using Extensions;
 using UnityEngine;
 using Zenject;
 
@@ -8,56 +9,56 @@ namespace Currency
 {
     public class CurrencyController
     {
-        private CurrencyData _currencyData;
+        private readonly CurrencyData _currencyData;
         private readonly SignalBus _signalBus;
 
         private CurrencyChangedSignal _currencyChangedSignal;
 
-        public CurrencyType CurrencyType => _currencyData.currencyType;
-        public BigDouble CurrentAmount => _currencyData.currentAmount;
+        public CurrencyType CurrencyType => _currencyData.UserData.currencyType;
+        public BigDouble CurrentAmount => _currencyData.UserData.currentAmount;
 
         public CurrencyController(SignalBus signalBus, CurrencyData currencyData)
         {
-            if (currencyData.currentAmount < 0)
+            if (currencyData.UserData.currentAmount < 0)
             {
-                currencyData.currentAmount = 0;
-                Debug.LogWarning("Tried to initiate money with negative value.");
+                currencyData.UserData.currentAmount = 0;
+                Utility.Logger.Log(LogType.Warning, "Tried to initiate money with negative value.");
             }
 
             _signalBus = signalBus;
             _currencyData = currencyData;
         }
 
-        public void AddAmount(BigDouble amountToAdd)
+        public async UniTask AddAmount(BigDouble amountToAdd)
         {
             if (CheckForNegativeValue(amountToAdd))
             {
-                Debug.LogWarning("Negative values are not handled.");
+                Utility.Logger.Log(LogType.Warning, "Negative values are not handled.");
                 return;
             }
 
-            UpdateCurrencyAmount(amountToAdd);
+            await UpdateCurrencyAmount(amountToAdd);
             InvokeAmountChange();
         }
 
-        public void SubtractAmount(BigDouble amountToSubtract)
+        public async UniTask SubtractAmount(BigDouble amountToSubtract)
         {
             if (CheckForNegativeValue(amountToSubtract))
             {
-                Debug.LogWarning("Negative values are not handled.");
+                Utility.Logger.Log(LogType.Warning, "Negative values are not handled.");
                 return;
             }
 
             if (HasEnoughAmount(amountToSubtract))
             {
-                UpdateCurrencyAmount(-amountToSubtract);
+                await UpdateCurrencyAmount(-amountToSubtract);
                 InvokeAmountChange();
             }
         }
 
         public bool HasEnoughAmount(BigDouble amountToCheck)
         {
-            return _currencyData.currentAmount >= amountToCheck;
+            return _currencyData.UserData.currentAmount >= amountToCheck;
         }
 
         private bool CheckForNegativeValue(BigDouble value)
@@ -65,17 +66,16 @@ namespace Currency
             return value < 0;
         }
 
-        private void UpdateCurrencyAmount(BigDouble amountToAdd)
+        private async UniTask UpdateCurrencyAmount(BigDouble amountToAdd)
         {
-            var currencyData = _currencyData;
-            currencyData.currentAmount += amountToAdd;
-            _currencyData = currencyData;
+            _currencyData.UserData.currentAmount += amountToAdd;
+            await _currencyData.SaveUserData();
         }
 
         private void InvokeAmountChange()
         {
             _currencyChangedSignal ??= new CurrencyChangedSignal();
-            _currencyChangedSignal.CurrencyData = this._currencyData;
+            _currencyChangedSignal.CurrencyDataModel = _currencyData.UserData;
 
             _signalBus.Fire(_currencyChangedSignal);
         }

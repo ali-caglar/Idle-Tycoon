@@ -1,10 +1,11 @@
 using BreakInfinity;
 using Enums;
+using Save;
 
-namespace Currency
+namespace Datas.DataModels.Currencies
 {
     [System.Serializable]
-    public struct CurrencyData
+    public class CurrencyDataModel : BaseDataModel<CurrencyDataModel>
     {
         public CurrencyType currencyType;
         public BigDouble currentAmount;

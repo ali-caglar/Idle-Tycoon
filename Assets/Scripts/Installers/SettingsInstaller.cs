@@ -1,4 +1,4 @@
-using Currency;
+using Datas.ScriptableDatas.Currencies;
 using TimeTick;
 using UnityEngine;
 using Workers;

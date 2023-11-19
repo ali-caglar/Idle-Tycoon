@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BreakInfinity;
 using Currency;
+using Datas.DataModels.Currencies;
+using Datas.ScriptableDatas.Currencies;
 using Enums;
 using Installers;
 using NUnit.Framework;
@@ -18,9 +20,9 @@ namespace Tests.CurrencyTests
         [SetUp]
         public void BindSettings()
         {
-            Container.Bind(typeof(CurrencyManager)).AsTransient();
             SignalBusInstaller.Install(Container);
             SettingsInstaller.InstallFromResource(SettingsInstallerPath, Container);
+            Container.Bind(typeof(CurrencyManager)).AsTransient();
 
             Container.DeclareSignal<CurrencyChangedSignal>();
             Container.Inject(this);
@@ -31,8 +33,8 @@ namespace Tests.CurrencyTests
         {
             var manager = Container.Resolve<CurrencyManager>();
 
-            var moneyStartValue = _currencyDatas.FirstOrDefault(x => x.currencyType == CurrencyType.Money).currentAmount;
-            var gemStartValue = _currencyDatas.FirstOrDefault(x => x.currencyType == CurrencyType.Gem).currentAmount;
+            var moneyStartValue = _currencyDatas.FirstOrDefault(x => x.UserData.currencyType == CurrencyType.Money).UserData.currentAmount;
+            var gemStartValue = _currencyDatas.FirstOrDefault(x => x.UserData.currencyType == CurrencyType.Gem).UserData.currentAmount;
 
             Assert.AreEqual(moneyStartValue, manager.GetCurrentAmount(CurrencyType.Money));
             Assert.AreEqual(gemStartValue, manager.GetCurrentAmount(CurrencyType.Gem));
