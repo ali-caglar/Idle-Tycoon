@@ -74,3 +74,7 @@ Assets/StreamingAssets/data
 Assets/StreamingAssets/Caglar
 Assets/StreamingAssets/Caglar.meta
 .idea
+
+# Ignore temporaries from GameCI
+/[Aa]rtifacts/
+/[Cc]odeCoverage/
