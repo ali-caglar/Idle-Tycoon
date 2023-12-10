@@ -19,7 +19,7 @@ jobs:
         id: getManualLicenseFile
         uses: game-ci/unity-request-activation-file@v2
         with:
-          # customImage: 'unityci/editor:ubuntu-2022.3.10f1-android-1.1.2'
+          customImage: 'editor-ubuntu-2022.3.10f1-linux-il2cpp-3.0.0'
           unityVersion: 2022.3.10f1
 
       # Upload artifact (Unity_v20XX.X.XXXX.alf)
