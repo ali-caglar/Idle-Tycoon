@@ -12,7 +12,7 @@ jobs:
     steps:
       # Checkout repository (required to test local actions)
       - name: Checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.1.1
 
       # Request manual activation file
       - name: Request manual activation file
