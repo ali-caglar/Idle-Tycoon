@@ -264,6 +264,11 @@ namespace Save
 
         if(fileName != "")
             filePath = Path.Combine(filePath, (fileName + ".txt"));
+#else
+            filePath = Path.Combine(Application.streamingAssetsPath, (DataPath + folderName));
+
+            if (fileName != "")
+                filePath = Path.Combine(filePath, (fileName + ".txt"));
 #endif
             return filePath;
         }
